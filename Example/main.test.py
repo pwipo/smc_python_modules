@@ -8,6 +8,7 @@ process = SmcEmulator.Process(
     SmcEmulator.ConfigurationToolImpl(
         "test",
         None,
+        None,
         {
             "value": SmcEmulator.Value("Hello world"),
             "param": SmcEmulator.Value("test value"),
