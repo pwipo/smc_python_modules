@@ -15,6 +15,7 @@ class ModuleMain(SMCApi.Module):
         self.fileTextValue = None
 
     def start(self, configurationTool):
+        # type: (SMCApi.ConfigurationTool) -> None
         # print "call start"
         # get settings
         self.counter = 0
@@ -36,6 +37,7 @@ class ModuleMain(SMCApi.Module):
             raise SMCApi.ModuleException("file text.txt not exist")
 
     def process(self, configurationTool, executionContextTool):
+        # type: (SMCApi.ConfigurationTool, SMCApi.ExecutionContextTool) -> None
         # send messages
         executionContextTool.addMessage(self.counter)
         self.counter += 1
@@ -103,10 +105,12 @@ class ModuleMain(SMCApi.Module):
                             configurationManaged.getName() + "." + ec.getName() + " as source")
 
     def update(self, configurationTool):
+        # type: (SMCApi.ConfigurationTool) -> None
         self.stop(configurationTool)
         self.start(configurationTool)
 
     def stop(self, configurationTool):
+        # type: (SMCApi.ConfigurationTool) -> None
         self.c = None
         self.counter = None
         self.value = None
