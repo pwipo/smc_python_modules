@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<properties>
+    <uuid>HtmlElementsForm</uuid>
+    <provider>python</provider>
+    <ver>1.0.0</ver>
+    <apiVer>1.4.1</apiVer>
+    <author>Nikolay V. Ulyanov</author>
+    <contacts>ulianownv@mail.ru</contacts>
+    <homePage>http://www.smcsystem.ru</homePage>
+    <className>main.py::ModuleMain</className>
+    <categories>Python, Html, Nocode, Form</categories>
+    <copyrightAndLicense>
+        <entry>
+            <key>en</key>
+            <value><![CDATA[The author and copyright holder is Nikolay V. Ulyanov.
+The program is free for use.
+Forbidden: changing the program code, its sale / resale, as well as other actions and rights not explicitly permitted.
+The program is supplied as is. For problems arising during the operation or installation of the program, the author, developer and
+distributor are not responsible.
+            ]]></value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value><![CDATA[Автором и правообладателем является Ульянов Николай Владимирович.
+Программа бесплатна для использования.
+Запрещено: изменение кода программы, её продажа/перепродажа а так же иные не разрешенные явно действия и права.
+Программа поставляется как есть. За проблемы, возникающие в процессе эксплуатации или установки программы, автор, разработчик и
+распространитель ответственности не несут.
+            ]]></value>
+        </entry>
+    </copyrightAndLicense>
+    <date>25-11-2024</date>
+
+    <defaultSettings>
+        <value>
+            <name>id</name>
+            <type>STRING</type>
+            <value>form1</value>
+            <subType>STRING</subType>
+            <description>
+                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким текстом в самом начале описания."/>
+                <entry k="en" v="Object identifier, used to find the figure with such text at the very beginning of the description."/>
+            </description>
+        </value>
+        <value>
+            <name>htmlHead</name>
+            <type>STRING</type>
+            <value></value>
+            <description>
+                <entry k="ru">
+                    <value><![CDATA[Данное значение будет вставлено в секцию <head>.]]></value>
+                </entry>
+                <entry k="en">
+                    <value><![CDATA[This value will be inserted into the <head> section.]]></value>
+                </entry>
+            </description>
+        </value>
+        <value>
+            <name>htmlScript</name>
+            <type>STRING</type>
+            <value></value>
+            <description>
+                <entry k="ru">
+                    <value>
+                        <![CDATA[Данное значение будет вставлено в конец секции <body>, внутри тега <script></script>.]]></value>
+                </entry>
+                <entry k="en">
+                    <value>
+                        <![CDATA[This value will be inserted at the end of the <body> section, inside the <script></script> tag.]]></value>
+                </entry>
+            </description>
+        </value>
+    </defaultSettings>
+
+    <types>
+        <type t="request" minS="1" maxS="1" minEC="0" maxEC="-1" minC="0" maxC="0">
+            <description>
+                <entry k="ru">
+                    <value><![CDATA[Каждый входящий запрос передается сюда и тут обрабатывается, на выход отдает объект с form-элементом, заголовками, скриптами и кешем данных.
+Если заданы контексты исполнения, то первый контекст рассматривает как функцию обработки пользовательского ввода (POST запрос).
+Остальные контекста - дочерние элементы, формат которых аналогичен другим (в том числе и этому модулю). Они отрисовываются внутри этой формы.
+                 ]]></value>
+                </entry>
+                <entry k="en">
+                    <value><![CDATA[Each incoming request is passed here and processed here, and an object with a form element, headers, scripts, and data cache is returned to the output.
+If execution contexts are specified, the first context is considered as a function for processing user input (POST request).
+The remaining contexts are child elements, the format of which is similar to others (including this module). They are drawn inside this form.
+                 ]]></value>
+                </entry>
+            </description>
+            <sources>
+                <source>
+                    <count>1</count>
+                    <elements>
+                        <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                            <value>
+                                <![CDATA[[{"type":"get", "cache":{"data": [{"var1":"value1","var2":"value2"},{"var1":"value3","var2":"value3"}]}}]]]>
+                            </value>
+                            <description>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[Сюда подается запрос в формате:
+    type - строка - значения: get-запрос на отрисовку, update-запрос на ввод данных.
+    cache - кеш старых данных (в рамках текущей сессии). Это те самые данные которые возвращает сам модуль (поле data). Иными словами это способ сохранить данные между запросами в рамках одно сеанса.
+    params - объект с полями для каждого параметра - передается поле params входящего объекта.
+    headers - объект с полями для каждого заголовка - передается поле headers входящего объекта.
+    multipart - массив объектов.
+        каждый из которых содержит поля:
+            name - строка - имя.
+            contentType - строка - тип.
+            headers - объект - с полями для каждого заголовка.
+            size - число - размер.
+            data - байтовый массив - содержит сами данные. Только если maxFileSizeFull выключен или размер меньше его.
+                                    ]]></value>
+                                </entry>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[A request is submitted here in the following format:
+    type - string - values: get-request for rendering, update-request for data entry.
+    cache - cache of old data (within the current session). This is the same data that the module itself returns (data field). In other words, this is a way to save data between requests within a single session.
+    params - an object with fields for each parameter - the params field of the incoming object is passed.
+    headers - an object with fields for each header - the headers field of the incoming object is passed.
+    multipart - an array of objects.
+        each of which contains the fields:
+            name - string - name.
+            contentType - string - type.
+            headers - an object with fields for each header.
+            size - number - size.
+            data - byte array - contains the data itself. Only if maxFileSizeFull is disabled or the size is less than it.
+                                    ]]></value>
+                                </entry>
+                            </description>
+                        </element>
+                    </elements>
+                </source>
+            </sources>
+            <output>
+                <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                    <value>
+                        <![CDATA[[{"type":"get", "htmlHead":"", "htmlBody":"", "htmlScript":"", "data":{"data": [{"var1":"value1","var2":"value2"},{"var1":"value3","var2":"value3"}]}}]]]></value>
+                    <description>
+                        <entry k="ru">
+                            <value><![CDATA[Возвращает объект с полями:
+    id - строка - идентификатор элемента.
+    htmlHead - строка - вставляется в заголовок страницы, объединяет свои и все дочерние заголовки.
+    htmlBody - строка - вставляется в тело страницы, объединяет свои и все дочерние элементы в одну форму.
+    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>, объединяет свои и все дочерние скрипты.
+    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
+                         ]]></value>
+                        </entry>
+                        <entry k="en">
+                            <value><![CDATA[Returns an object with the fields:
+    id - string - element identifier.
+    htmlHead - string - inserted into the page header, combines its own and all child headers.
+    htmlBody - string - inserted into the page body, combines its own and all child elements into one form.
+    htmlScript - string - script, inserted at the end of the page body in the <script> tag, combines its own and all child scripts.
+    data - object - data that will be saved and sent back with a new request within this session.
+                         ]]></value>
+                        </entry>
+                    </description>
+                </element>
+            </output>
+            <ecs>
+                <ec c="1" o="true">
+                    <description>
+                        <entry k="ru">
+                            <value><![CDATA[Если приходит запрос update, и есть этот контекст, то он вызывается.
+Ему передаются весь входящий объект кроме кеша. Если он возвращает ошибку, то считает что произошла ошибка.
+                            ]]></value>
+                        </entry>
+                        <entry k="en">
+                            <value><![CDATA[If an update request comes in, and this context exists, it is called.
+The entire incoming object is passed to itexcept the cache. If it returns an error, it considers that an error occurred.
+                            ]]></value>
+                        </entry>
+                    </description>
+                    <elements>
+                        <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                            <value><![CDATA[[{"type":"get", "inputParams":[], "inputHeaders":[], "inputMultipart":[]}]]]></value>
+                            <description>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[Сюда подается запрос, дополненный кешем. Формат:
+    type - строка - значения: get, update. get - только отобразить данные (GET), update - изменить и отобразить (POST).
+    inputParams - объект с полями для каждого параметра - передается поле params входящего объекта.
+    inputHeaders - объект с полями для каждого заголовка - передается поле headers входящего объекта.
+    inputMultipart - если тип multipart - массив объектов.
+        каждый из которых содержит поля:
+            name - строка - имя.
+            contentType - строка - тип.
+            headers - объект - с полями для каждого заголовка.
+            size - число - размер.
+            data - байтовый массив - содержит сами данные. Только если maxFileSizeFull выключен или размер меньше его.
+        передается поле multipart входящего объекта.
+                                    ]]></value>
+                                </entry>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[The request, supplemented by the cache, is submitted here. Format:
+    type - string - values: get, update. get - only display data (GET), update - change and display (POST).
+    inputParams - object with fields for each parameter - the params field of the incoming object is passed.
+    inputHeaders - object with fields for each header - the headers field of the incoming object is passed.
+    inputMultipart - if the type is multipart - array of objects.
+        each of which contains the fields:
+            name - string - name.
+            contentType - string - type.
+            headers - object - with fields for each header.
+            size - number - size.
+            data - byte array - contains the data itself. Only if maxFileSizeFull is disabled or the size is less than it.
+        the multipart field of the incoming object is passed.
+                                    ]]></value>
+                                </entry>
+                            </description>
+                        </element>
+                    </elements>
+                </ec>
+                <ec c="-1">
+                    <description>
+                        <entry k="ru">
+                            <value><![CDATA[Дочерний элемент, который может себя отрисовать и так же принимает входящие параметры, для самостоятельной их обработки.
+На вход передается объект с входящими параметрами, а так же кеш (старые данные, переданные ранее).
+Возвращает объект с полями:
+    id - строка - идентификатор элемента.
+    htmlHead - строка - вставляется в заголовок страницы.
+    htmlBody - строка - вставляется в тело страницы.
+    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
+    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
+Если это update запрос, то сначала дочерним элементам передается он со всеми данными, и если нет ошибок, то потом передается второй запрос get без кеша.
+Иными словами сначала отсылаются новые данные, для обработки, а потом отрисовывается пустая форма.
+                            ]]></value>
+                        </entry>
+                        <entry k="en">
+                            <value><![CDATA[A child element that can draw itself and also accepts input parameters for their independent processing.
+An object with incoming parameters is passed to the input, as well as a cache (old data, previously passed).
+Returns an object with fields:
+    id - string - element identifier.
+    htmlHead - string - inserted into the page header.
+    htmlBody - string - inserted into the page body.
+    htmlScript - string - script, inserted into the end of the page body in the <script> tag.
+    data - object - data that will be saved and passed back with a new request within this session.
+If this is an update request, then first it is passed to the child elements with all the data, and if there are no errors, then the second get request is passed without the cache.
+In other words, first new data is sent for processing, and then an empty form is drawn.
+                            ]]></value>
+                        </entry>
+                    </description>
+                    <elements>
+                        <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                            <value><![CDATA[[{"type":"get", "cache":[], "inputParams":[], "inputHeaders":[], "inputMultipart":[]}]]]></value>
+                            <description>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[Сюда подается запрос, дополненный кешем. Формат:
+    type - строка - значения: get, update. get - только отобразить данные (GET), update - изменить и отобразить (POST).
+    cache - массив объектов - кеш со старыми данными (в рамках этой сессии) ото всех дочерних элементов.
+        Каждый объект - данные, сохраненные данные от соответствующего дочернего элемента (только если есть данные).
+        Формат:
+            id - строка - идентификатор элемента
+            data - объект - данные от элемента.
+    inputParams - объект с полями для каждого параметра - передается поле params входящего объекта.
+    inputHeaders - объект с полями для каждого заголовка - передается поле headers входящего объекта.
+    inputMultipart - если тип multipart - массив объектов.
+        каждый из которых содержит поля:
+            name - строка - имя.
+            contentType - строка - тип.
+            headers - объект - с полями для каждого заголовка.
+            size - число - размер.
+            data - байтовый массив - содержит сами данные. Только если maxFileSizeFull выключен или размер меньше его.
+        передается поле multipart входящего объекта.
+    error - строка - если есть ошибка в процесе изменения данных, то она пишется сюда.
+                                    ]]></value>
+                                </entry>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[The request, supplemented by the cache, is submitted here. Format:
+    type - string - values: get, update. get - only display data (GET), update - change and display (POST).
+    cache - array of objects - cache with old data (within this session) from all child elements.
+        Each object - data, saved data from the corresponding child element (only if there is data).
+        Format:
+            id - string - element identifier
+            data - object - data from the element.
+    inputParams - object with fields for each parameter - the params field of the incoming object is passed.
+    inputHeaders - object with fields for each header - the headers field of the incoming object is passed.
+    inputMultipart - if the type is multipart - array of objects.
+        each of which contains the fields:
+            name - string - name.
+            contentType - string - type.
+            headers - object - with fields for each header.
+            size - number - size.
+            data - byte array - contains the data itself. Only if maxFileSizeFull is disabled or the size is less than it.
+        the multipart field of the incoming object is passed.
+    error - string - if there is an error in the process of changing data, it is written here.
+                                    ]]></value>
+                                </entry>
+                            </description>
+                        </element>
+                    </elements>
+                </ec>
+            </ecs>
+        </type>
+    </types>
+
+    <useStorage>false</useStorage>
+    <threadSafe>true</threadSafe>
+
+    <description>
+        <entry>
+            <key>en</key>
+            <value>The module is a form (form tag) and is part of a set of modules that allow you to create web pages in the no-code style.</value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value>Модуль является формой (тег form) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.
+            </value>
+        </entry>
+    </description>
+
+    <help>
+        <entry>
+            <key>en</key>
+            <value><![CDATA[The module is a form (<form> tag) and is part of a set of modules that allow you to create web pages in the no-code style.
+Typically, it is a child element of the HtmlElementsRoot module. For the format of requests and responses, see its description.
+Operation algorithm.
+For any request, it polls its child elements (all connected contexts), passing them an object with incoming parameters and a cache.
+It combines the responses, forms a <form> element and returns it as a response.
+The format of incoming and outgoing objects is in the description of the execution context.
+Processes 2 types of requests:
+    get - you only need to render the content.
+    update - updates the internal representation and then renders the content.
+If you specify an id, then at startup it will look for a figure (rectangle) with this value in the description.
+If it finds one, it will use its coordinates to calculate its position on the page.
+            ]]></value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value><![CDATA[Модуль является формой (тег <form>) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.
+Как правило, является дочерним элементом, для модуля HtmlElementsRoot. Формат запросов и ответов смотри в его описании.
+Алгоритм работы.
+На любой запрос опрашивает свои дочерние элементы (все подключенные контексты), передавая им объект с входящими параметрами и кешем.
+Ответы объединяет, формирует элемент <form> и возвращает в виде ответа.
+Формат входящих и исходящих объектов находится в описании контекста исполнения.
+Обрабатывает 2 типа запросов:
+    get - нужно только отрисовать содержимое.
+    update - обновляет внутреннее представление и затем отрисовывает содержимое.
+Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
+Если найдет, то будет использовать его координаты для вычисления положения себя на странице.
+]]></value>
+        </entry>
+    </help>
+
+    <examples/>
+    <icon>
+        <![CDATA[iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAqElEQVR4nO3WQQrDMAxE0bn/sRp6rt9tCQTLbYzH8TzQIpBFBtmKpIjo9ZaEeR2VICxSTeUXJyFBzJCO7NoRBk8nEqTTXeObUR2pHoEEObG5I48JQqaWPMbvaCSIGdKRTplaMl0a/0V2rV2WxqrHBSG7ljym1mgkiBnSkU7VVeNXzB6/d2HWD/HquVpnCaLdjxarBxmNBFm9I5hX02HwkTTq1Y4REfryASIFVNja7HaWAAAAAElFTkSuQmCC]]></icon>
+
+</properties>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<properties>
+    <uuid>HtmlElementsInput</uuid>
+    <provider>python</provider>
+    <ver>1.0.0</ver>
+    <apiVer>1.4.1</apiVer>
+    <author>Nikolay V. Ulyanov</author>
+    <contacts>ulianownv@mail.ru</contacts>
+    <homePage>http://www.smcsystem.ru</homePage>
+    <className>main.py::ModuleMain</className>
+    <categories>Python, Html, Nocode, Form, Input</categories>
+    <copyrightAndLicense>
+        <entry>
+            <key>en</key>
+            <value><![CDATA[The author and copyright holder is Nikolay V. Ulyanov.
+The program is free for use.
+Forbidden: changing the program code, its sale / resale, as well as other actions and rights not explicitly permitted.
+The program is supplied as is. For problems arising during the operation or installation of the program, the author, developer and
+distributor are not responsible.
+            ]]></value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value><![CDATA[Автором и правообладателем является Ульянов Николай Владимирович.
+Программа бесплатна для использования.
+Запрещено: изменение кода программы, её продажа/перепродажа а так же иные не разрешенные явно действия и права.
+Программа поставляется как есть. За проблемы, возникающие в процессе эксплуатации или установки программы, автор, разработчик и
+распространитель ответственности не несут.
+            ]]></value>
+        </entry>
+    </copyrightAndLicense>
+    <date>26-11-2024</date>
+
+    <defaultSettings>
+        <value>
+            <name>id</name>
+            <type>STRING</type>
+            <value>input1</value>
+            <subType>STRING</subType>
+            <description>
+                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким текстом в самом начале описания."/>
+                <entry k="en" v="Object identifier, used to find the figure with such text at the very beginning of the description."/>
+            </description>
+        </value>
+        <value>
+            <name>type</name>
+            <type>STRING</type>
+            <value>input</value>
+            <validValues>
+                <value>input</value>
+                <value>textarea</value>
+            </validValues>
+            <description>
+                <entry k="ru" v="Тип поля ввода."/>
+                <entry k="en" v="Input field type."/>
+            </description>
+        </value>
+        <value>
+            <name>htmlHead</name>
+            <type>STRING</type>
+            <value></value>
+            <description>
+                <entry k="ru">
+                    <value><![CDATA[Данное значение будет вставлено в секцию <head>.]]></value>
+                </entry>
+                <entry k="en">
+                    <value><![CDATA[This value will be inserted into the <head> section.]]></value>
+                </entry>
+            </description>
+        </value>
+        <value>
+            <name>htmlScript</name>
+            <type>STRING</type>
+            <value></value>
+            <description>
+                <entry k="ru">
+                    <value>
+                        <![CDATA[Данное значение будет вставлено в конец секции <body>, внутри тега <script></script>.]]></value>
+                </entry>
+                <entry k="en">
+                    <value>
+                        <![CDATA[This value will be inserted at the end of the <body> section, inside the <script></script> tag.]]></value>
+                </entry>
+            </description>
+        </value>
+    </defaultSettings>
+
+    <types>
+        <type t="request" minS="1" maxS="1" minEC="0" maxEC="2" minC="0" maxC="0">
+            <description>
+                <entry k="ru">
+                    <value><![CDATA[Каждый входящий запрос передается сюда и тут обрабатывается, на выход отдает объект с input/textarea-элементом, заголовками, скриптами и кешем данных.
+Если заданы контексты исполнения, то:
+    первый контекст рассматривает как функция инициализация значения. Она вызывается, если во входящем запросе нет кеша данных (нет предыдущего значения).
+    второй контекст рассматривает как функцию обработки пользовательского ввода (POST запрос).
+                 ]]></value>
+                </entry>
+                <entry k="en">
+                    <value><![CDATA[Each incoming request is passed here and processed here, and an object with an input/textarea element, headers, scripts, and data cache is returned as output.
+If execution contexts are specified, then:
+    the first context is considered as a function of value initialization. It is called if there is no data cache in the incoming request (no previous value).
+    the second context is considered as a function of user input processing (POST request).
+                 ]]></value>
+                </entry>
+            </description>
+            <sources>
+                <source>
+                    <count>1</count>
+                    <elements>
+                        <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                            <value>
+                                <![CDATA[[{"type":"get", "cache":{"value":"123"}}]]]>
+                            </value>
+                            <description>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[Сюда подается запрос в формате:
+    type - строка - значения: get-запрос на отрисовку, update-запрос на ввод данных.
+    cache - кеш старых данных (в рамках текущей сессии). Это те самые данные которые возвращает сам модуль (поле data). Иными словами это способ сохранить данные между запросами в рамках одно сеанса.
+        У этого модуля есть только поле value, куда записывается текущее значение, которое выбирается из параметров с идентификатором, указанным в настройке id.
+    params - объект с полями для каждого параметра - передается поле params входящего объекта.
+    headers - объект с полями для каждого заголовка - передается поле headers входящего объекта.
+    multipart - массив объектов.
+        каждый из которых содержит поля:
+            name - строка - имя.
+            contentType - строка - тип.
+            headers - объект - с полями для каждого заголовка.
+            size - число - размер.
+            data - байтовый массив - содержит сами данные. Только если maxFileSizeFull выключен или размер меньше его.
+                                    ]]></value>
+                                </entry>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[A request is submitted here in the following format:
+    type - string - values: get-request for rendering, update-request for data entry.
+    cache - cache of old data (within the current session). This is the same data that the module itself returns (data field). In other words, this is a way to save data between requests within a single session.
+        This module has only a value field, where the current value is written, which is selected from the parameters with the identifier specified in the id setting.
+    params - an object with fields for each parameter - the params field of the incoming object is passed.
+    headers - an object with fields for each header - the headers field of the incoming object is passed.
+    multipart - an array of objects.
+        each of which contains the fields:
+            name - string - name.
+            contentType - string - type.
+            headers - an object with fields for each header.
+            size - number - size.
+            data - byte array - contains the data itself. Only if maxFileSizeFull is disabled or the size is less than it.
+                                    ]]></value>
+                                </entry>
+                            </description>
+                        </element>
+                    </elements>
+                </source>
+            </sources>
+            <output>
+                <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                    <value>
+                        <![CDATA[[{"type":"get", "htmlHead":"", "htmlBody":"", "htmlScript":"", "data":{"value":"123"}}]]]></value>
+                    <description>
+                        <entry k="ru">
+                            <value><![CDATA[Возвращает объект с полями:
+    id - строка - идентификатор элемента.
+    htmlHead - строка - вставляется в заголовок страницы.
+    htmlBody - строка - вставляется в тело страницы.
+    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
+    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
+        У этого модуля есть только поле value, куда записывается текущее значение, которое выбирается из параметров с идентификатором, указанным в настройке id.
+                         ]]></value>
+                        </entry>
+                        <entry k="en">
+                            <value><![CDATA[Returns an object with the fields:
+    id - string - element identifier.
+    htmlHead - string - inserted into the page header.
+    htmlBody - string - inserted into the page body.
+    htmlScript - string - script, inserted at the end of the page body in the <script> tag.
+    data - object - data that will be saved and sent back with a new request within this session.
+        This module has only a value field, where the current value is written, which is selected from the parameters with the identifier specified in the id setting.
+                         ]]></value>
+                        </entry>
+                    </description>
+                </element>
+            </output>
+            <ecs>
+                <ec c="1" o="true">
+                    <description>
+                        <entry k="ru">
+                            <value>Если приходит запрос update, и есть этот контекст, то он вызывается. Ему передаются новое значение.</value>
+                        </entry>
+                        <entry k="en">
+                            <value>If an update request comes in, and this context exists, it is called. It is given a new meaning.</value>
+                        </entry>
+                    </description>
+                    <elements>
+                        <element t="VALUE" c="1" vt="STRING" v="value1"/>
+                    </elements>
+                </ec>
+                <ec c="1" o="true">
+                    <description>
+                        <entry k="ru">
+                            <value>Если приходит запрос update, и есть этот контекст, то он вызывается. Ему передаются новое значение.</value>
+                        </entry>
+                        <entry k="en">
+                            <value>If an update request comes in, and this context exists, it is called. It is given a new meaning.</value>
+                        </entry>
+                    </description>
+                    <elements>
+                        <element t="VALUE" c="1" vt="STRING" v="value1"/>
+                    </elements>
+                </ec>
+            </ecs>
+        </type>
+    </types>
+
+    <useStorage>false</useStorage>
+    <threadSafe>true</threadSafe>
+
+    <description>
+        <entry>
+            <key>en</key>
+            <value><![CDATA[The module is an input field (tag <input> or <textarea>) and is part of a set of modules that allow you to create web pages in the no-code style.]]></value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value><![CDATA[Модуль является полем ввода (тег <input> или <textarea>) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.]]></value>
+        </entry>
+    </description>
+
+    <help>
+        <entry>
+            <key>en</key>
+            <value><![CDATA[The module is an input field (tag <input> or <textarea>) and is part of a set of modules that allow you to create web pages in the no-code style.
+As a rule, it is a child element for the HtmlElementsForm module. For the format of requests and responses, see its description.
+Processes 2 types of requests:
+    get - renders itself - returns an object with html elements and a data cache.
+    update - if there is one, calls the first context passing the input parameter (id is specified), then updates the internal representation and then renders the content (similar to get).
+If you specify id, then at startup it will look for a figure (rectangle) with this value in the description.
+If it finds one, it will use its coordinates to calculate its position on the page.
+            ]]></value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value><![CDATA[Модуль является полем ввода (тег <input> или <textarea>) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.
+Как правило, является дочерним элементом, для модуля HtmlElementsForm. Формат запросов и ответов смотри в его описании.
+Обрабатывает 2 типа запросов:
+    get - отрисовывает себя - возвращает объект с html элементами и кешем данных.
+    update - если есть, вызывает первый контекст передавая входящий параметр (задается id), далее обновляет внутреннее представление и затем отрисовывает содержимое (аналогично get).
+Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
+Если найдет, то будет использовать его координаты для вычисления положения себя на странице.
+]]></value>
+        </entry>
+    </help>
+
+    <examples/>
+    <icon>
+        <![CDATA[iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABe0lEQVR4nO2YTU7DMBCFvxWsQGwS8XMoENfg55DNoqRqUQWV4BzA3qjSVLJCHHDbicfFTxopi2RmXt7E9gsU/D+0wJQDgJPIHq4QMYaiiDUURayhKGINWSkyAeZAHUGklmdMHV9m0uxrD5k+IrXc6+RZM6iAF2nsDbgYINK99xxjqAJkfCLmSQyR2RDJhoQ//yvvm3Gd677vyCwq7+37kYUSv5EZjUTT8wY38SXr/T1wtMWYrSLH6Rh4AJ6kdqivJpaIH8/AZSSZGBJXwPKPvaw34iicADfAuyRYRCoTo8TSG8Vrqb13nHlk7hTyP3ok1rVUcSvFpkq/jpwooY5TKfahkPtTcquM05hHczf2kb8QSaXIJGCYQh5jEdqkdsw733VxCRmmbkHfKLVKeWcWPUYS71IpeYwk3qXu+Il9eQytvEk8RhLvUil5jCTepd7SY4yWt41Yq2M9Bgp5m9CeldWvTQb6LUQSwRVFjMEVRXJTxGUWP3AwRAowgG9vZGsPHx374wAAAABJRU5ErkJggg==]]></icon>
+
+</properties>
