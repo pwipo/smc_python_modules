@@ -49,14 +49,15 @@ class Shape:
         self.offset2Y = None  # type: int
         if 'offset2Y' in keys:
             self.offset2Y = obj.offset2Y  # type: int
-        self.color = obj.color  # type: int
+        self.color = obj.color & 0xffffff # type: int
         self.strokeWidth = obj.strokeWidth  # type: int
-        self.description = obj.description  # type: str
-        self.descriptionList = []  # type: List[str]
-        if self.description:
-            self.descriptionList = map(lambda s: s.strip(), filter(lambda s: s and s.strip(), self.description.strip().split(" ")))
-        if len(self.descriptionList) == 0:
-            self.descriptionList.append("")
+        self.descriptionId = ""
+        self.descriptionOther = ""
+        if obj.description:
+            arrStr = obj.description.strip().split(" ", 2)
+            self.descriptionId = arrStr[0].strip()
+            if len(arrStr) > 1:
+                self.descriptionOther = arrStr[1].strip()
         self.text = None  # type: str
         if 'text' in keys:
             self.text = obj.text  # type: str
@@ -66,6 +67,9 @@ class Shape:
         self.imageBytes = None  # type: bytes
         if 'imageBytes' in keys:
             self.imageBytes = obj.imageBytes  # type: bytes
+        self.fontSize = None  # type: int
+        if 'fontSize' in keys:
+            self.fontSize = obj.fontSize  # type: int
 
 
 class CacheElement:
@@ -131,7 +135,7 @@ class ModuleMain(SMCApi.Module):
             objList = map(lambda s: Shape(s), SmcUtils.convertFromObjectArray(objectArray, True))  # type: List[Shape]
             shape = next(iter(
                 filter(
-                    lambda s: s.type == "rectangle" and s.descriptionList[0].startswith(self.id), objList)))  # type: Shape
+                    lambda s: s.type == "rectangle" and s.descriptionId == self.id, objList)))  # type: Shape
 
         self.position1X = 0
         self.position1Y = 0
@@ -202,9 +206,10 @@ function convertCoordY(y) {
                     paramObjCopy.fields = paramObj.fields[:]
                     if cacheElement is not None and cacheElement.data and len(cacheElement.data) > i and cacheElement.data[i].data:
                         paramObjCopy.fields.append(SMCApi.ObjectField("cache", cacheElement.data[i].data))
-                    dataList.append(HtmlElementsOutput(
-                        SmcUtils.executeAndGetElement(executionContextTool, i,
-                                                      [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])))
+                    resultElement = SmcUtils.executeAndGetElement(
+                        executionContextTool, i, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])
+                    if resultElement:
+                        dataList.append(HtmlElementsOutput(resultElement))
             elif httpInput.method == "POST":
                 paramObj.fields.append(SMCApi.ObjectField("type", "update"))
                 for i in range(executionContextTool.getFlowControlTool().countManagedExecutionContexts()):
@@ -213,14 +218,15 @@ function convertCoordY(y) {
                     if cacheElement is not None and cacheElement.data and len(cacheElement.data) > i and cacheElement.data[i].data:
                         paramObjCopy.fields.append(SMCApi.ObjectField("cache", cacheElement.data[i].data))
                     if httpInput.params:
-                        paramObjCopy.fields.append(SMCApi.ObjectField("inputParams", httpInput.params))
+                        paramObjCopy.fields.append(SMCApi.ObjectField("params", httpInput.params))
                     if httpInput.headers:
-                        paramObjCopy.fields.append(SMCApi.ObjectField("inputHeaders", httpInput.headers))
+                        paramObjCopy.fields.append(SMCApi.ObjectField("headers", httpInput.headers))
                     if httpInput.multipart:
-                        paramObjCopy.fields.append(SMCApi.ObjectField("inputMultipart", httpInput.multipart))
-                    dataList.append(HtmlElementsOutput(
-                        SmcUtils.executeAndGetElement(executionContextTool, i,
-                                                      [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])))
+                        paramObjCopy.fields.append(SMCApi.ObjectField("multipart", httpInput.multipart))
+                    resultElement = SmcUtils.executeAndGetElement(
+                        executionContextTool, i, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])
+                    if resultElement:
+                        dataList.append(HtmlElementsOutput(resultElement))
 
             cacheElement.date = datetime.datetime.now()
             cacheElement.data = dataList

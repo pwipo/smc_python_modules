@@ -2,7 +2,7 @@
 <properties>
     <uuid>HtmlElementsButton</uuid>
     <provider>python</provider>
-    <ver>1.0.0</ver>
+    <ver>1.0.1</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>

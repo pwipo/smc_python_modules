@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import base64
 
 import SMCApi
 import SmcUtils
@@ -50,13 +49,15 @@ class ModuleMain(SMCApi.Module):
         self.htmlHead = None  # type: str
         self.htmlScript = None  # type: str
         self.elementAttrs = None  # type: str
-        self.image = None  # type: str
+        self.text = None  # type: str
+        self.href = None  # type: str
 
     def start(self, configurationTool):
         # type: (SMCApi.ConfigurationTool) -> None
         self.id = SmcUtils.getString(configurationTool.getSetting("id"))
         self.htmlHead = SmcUtils.getString(configurationTool.getSetting("htmlHead"))
         htmlScript = SmcUtils.getString(configurationTool.getSetting("htmlScript"))
+        self.href = SmcUtils.getString(configurationTool.getSetting("href"))
 
         objectArray = SmcUtils.getObjectArray(configurationTool.getInfo("decorationShapes"))
         shape = None  # type: Shape
@@ -65,7 +66,7 @@ class ModuleMain(SMCApi.Module):
             objList = map(lambda s: Shape(s), SmcUtils.convertFromObjectArray(objectArray, True))  # type: List[Shape]
             shape = next(iter(
                 filter(
-                    lambda s: s.type == "rectangle" and s.descriptionId == self.id, objList)))  # type: Shape
+                    lambda s: s.type == "text" and s.descriptionId == self.id, objList)))  # type: Shape
             if shape:
                 shapeParent = next(iter(
                     sorted(
@@ -85,7 +86,7 @@ class ModuleMain(SMCApi.Module):
         parentPositionY = 1
         styles = ""
         self.elementAttrs = ""
-        self.image = ""
+        self.text = ""
         if shape:
             position1X = shape.point1X
             position1Y = shape.point1Y
@@ -96,10 +97,11 @@ class ModuleMain(SMCApi.Module):
                 parentPositionY = shapeParent.point1Y
             if shape.descriptionOther:
                 self.elementAttrs = shape.descriptionOther
-            styles += "border-style: solid; border-width: %dpx; border-color: #%s;" % (
-                shape.strokeWidth, '{0:06X}'.format(shape.color))
-            if shape.imageBytes:
-                self.image = base64.b64encode(shape.imageBytes)
+            styles += "color: #%s;" % '{0:06X}'.format(shape.color)
+            if shape.fontSize:
+                styles += " font-size: %dpx;" % shape.fontSize
+            if shape.text:
+                self.text = shape.text
             configurationTool.loggerDebug(
                 "Find shape %s %d:%d, parent: %d:%d" % (self.id, shape.point1X, shape.point1Y, parentPositionX, parentPositionY))
 
@@ -147,8 +149,8 @@ if(element){
         ])
         objOutput.fields.append(SMCApi.ObjectField(
             "htmlBody",
-            "<img id=\"%s\" %s src=\"data:image/jpeg;base64,%s\"/>" %
-            (self.id, self.elementAttrs, self.image)))
+            "<a id=\"%s\" href=\"%s\" %s >%s</a>" %
+            (self.id, self.href, self.elementAttrs, self.text)))
         return SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [objOutput])
 
     def update(self, configurationTool):
@@ -162,4 +164,5 @@ if(element){
         self.htmlHead = None  # type: str
         self.htmlScript = None  # type: str
         self.elementAttrs = None  # type: str
-        self.image = None  # type: str
+        self.text = None  # type: str
+        self.href = None  # type: str

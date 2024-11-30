@@ -2,7 +2,7 @@
 <properties>
     <uuid>HtmlElementsDiv</uuid>
     <provider>python</provider>
-    <ver>1.0.0</ver>
+    <ver>1.0.1</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
@@ -73,16 +73,18 @@ distributor are not responsible.
     </defaultSettings>
 
     <types>
-        <type t="request" minS="1" maxS="1" minEC="0" maxEC="1" minC="0" maxC="0">
+        <type t="request" minS="1" maxS="1" minEC="0" maxEC="-1" minC="0" maxC="0">
             <description>
                 <entry k="ru">
                     <value><![CDATA[Каждый входящий запрос передается сюда и тут обрабатывается, на выход отдает объект с div-элементом, заголовками, скриптами.
-Если есть контекст, то он всегда вызывается для получения строки, которая будут вставлена в элемент (тело).
+Если контекст 1, то рассматривает его как поставщик строкового значения (не элемента), он вызывается при каждом значение и возвращаемое значение вставляется в тело элемента.
+Если их больше 1, то рассматривает как полноценные элементы.
                     ]]></value>
                 </entry>
                 <entry k="en">
-                    <value><![CDATA[Each incoming request is passed here and processed here, and an object with an button element, headers, scripts is returned as output.
-If there is a context, it is always called to get the string that will be inserted into the element (body).
+                    <value><![CDATA[Each incoming request is passed here and processed here, and an object with an div element, headers, scripts is returned as output.
+If the context is 1, then it is considered as a string value (not element) supplier, it is called for each value and the returned value is inserted into the element body.
+If there are more than 1, then it is considered as full elements.
                     ]]></value>
                 </entry>
             </description>
@@ -162,14 +164,101 @@ If there is a context, it is always called to get the string that will be insert
                 <ec c="1" o="true">
                     <description>
                         <entry k="ru">
-                            <value>Вызывается при каждом значение и возвращаемое значение вставляется в тело элемента.</value>
+                            <value><![CDATA[Если контекст 1, то рассматривает его как поставщик строкового значения (не элемента), который отрисовывает в теле как есть.
+Вызывается при каждом значение и возвращаемое значение вставляется в тело элемента.
+                            ]]></value>
                         </entry>
                         <entry k="en">
-                            <value>Called on every value and the return value is inserted into the element's body.</value>
+                            <value><![CDATA[If context is 1, treats it as a string value (not element) provider, which is rendered as is in the body.
+Called on each value and the returned value is inserted into the element body.
+                            ]]></value>
                         </entry>
                     </description>
                     <elements>
                         <element t="VALUE" c="1" vt="STRING" v="Hello world!"/>
+                    </elements>
+                </ec>
+                <ec c="-1" o="true">
+                    <description>
+                        <entry k="ru">
+                            <value><![CDATA[Если контекстов больше 1, то рассматривает их как полноценные элементы.
+Дочерний элемент, который может себя отрисовать и так же принимает входящие параметры, для самостоятельной их обработки.
+На вход передается объект с входящими параметрами, а так же кеш (старые данные, переданные ранее).
+Возвращает объект с полями:
+    id - строка - идентификатор элемента.
+    htmlHead - строка - вставляется в заголовок страницы.
+    htmlBody - строка - вставляется в тело страницы.
+    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
+    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
+Если это update запрос, то сначала дочерним элементам передается он со всеми данными, и если нет ошибок, то потом передается второй запрос get без кеша.
+Иными словами сначала отсылаются новые данные, для обработки, а потом отрисовывается пустая форма.
+                            ]]></value>
+                        </entry>
+                        <entry k="en">
+                            <value><![CDATA[If there are more than 1 context, then it considers them as full-fledged elements.
+A child element that can draw itself and also accepts input parameters for their independent processing.
+An object with incoming parameters is passed to the input, as well as a cache (old data, previously passed).
+Returns an object with fields:
+    id - string - element identifier.
+    htmlHead - string - inserted into the page header.
+    htmlBody - string - inserted into the page body.
+    htmlScript - string - script, inserted into the end of the page body in the <script> tag.
+    data - object - data that will be saved and passed back with a new request within this session.
+If this is an update request, then first it is passed to the child elements with all the data, and if there are no errors, then the second get request is passed without the cache.
+In other words, first new data is sent for processing, and then an empty form is drawn.
+                            ]]></value>
+                        </entry>
+                    </description>
+                    <elements>
+                        <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                            <value><![CDATA[[{"type":"get", "cache":[], "params":[], "headers":[], "multipart":[]}]]]></value>
+                            <description>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[Сюда подается запрос, дополненный кешем. Формат:
+    type - строка - значения: get, update. get - только отобразить данные (GET), update - изменить и отобразить (POST).
+    cache - массив объектов - кеш со старыми данными (в рамках этой сессии) ото всех дочерних элементов.
+        Каждый объект - данные, сохраненные данные от соответствующего дочернего элемента (только если есть данные).
+        Формат:
+            id - строка - идентификатор элемента
+            data - объект - данные от элемента.
+    params - объект с полями для каждого параметра - передается поле params входящего объекта.
+    headers - объект с полями для каждого заголовка - передается поле headers входящего объекта.
+    multipart - если тип multipart - массив объектов.
+        каждый из которых содержит поля:
+            name - строка - имя.
+            contentType - строка - тип.
+            headers - объект - с полями для каждого заголовка.
+            size - число - размер.
+            data - байтовый массив - содержит сами данные. Только если maxFileSizeFull выключен или размер меньше его.
+        передается поле multipart входящего объекта.
+    error - строка - если есть ошибка в процесе изменения данных, то она пишется сюда.
+                                    ]]></value>
+                                </entry>
+                                <entry>
+                                    <key>ru</key>
+                                    <value><![CDATA[The request, supplemented by the cache, is submitted here. Format:
+    type - string - values: get, update. get - only display data (GET), update - change and display (POST).
+    cache - array of objects - cache with old data (within this session) from all child elements.
+        Each object - data, saved data from the corresponding child element (only if there is data).
+        Format:
+            id - string - element identifier
+            data - object - data from the element.
+    params - object with fields for each parameter - the params field of the incoming object is passed.
+    headers - object with fields for each header - the headers field of the incoming object is passed.
+    multipart - if the type is multipart - array of objects.
+        each of which contains the fields:
+            name - string - name.
+            contentType - string - type.
+            headers - object - with fields for each header.
+            size - number - size.
+            data - byte array - contains the data itself. Only if maxFileSizeFull is disabled or the size is less than it.
+        the multipart field of the incoming object is passed.
+    error - string - if there is an error in the process of changing data, it is written here.
+                                    ]]></value>
+                                </entry>
+                            </description>
+                        </element>
                     </elements>
                 </ec>
             </ecs>
@@ -199,10 +288,13 @@ If there is a context, it is always called to get the string that will be insert
             <key>en</key>
             <value><![CDATA[The module is an input field (tag div) and is part of a set of modules that allow you to create web pages in the no-code style.
 As a rule, it is a child element for the HtmlElementsRoot module. For the format of requests and responses, see its description.
+For any request, it polls its child elements (all connected contexts), passing them an object with incoming parameters and a cache.
+Combines the responses, forms a <div> element with child elements and returns it as a response.
+If the context is 1, then it considers it as a supplier of a string value (not an element), which it renders in the body as is, if there are more than 1, then it considers them as full-fledged elements.
 Processes 2 types of requests:
     get - renders itself - returns an object with html elements and a data cache.
     update - renders the content (similar to get).
-If you specify id, then at startup it will look for a figure (rectangle) with this value in the description.
+If you specify an id, then at startup it will look for a figure (rectangle) with this value in the description.
 If it finds one, it will use its coordinates to calculate its position on the page.
             ]]></value>
         </entry>
@@ -210,6 +302,9 @@ If it finds one, it will use its coordinates to calculate its position on the pa
             <key>ru</key>
             <value><![CDATA[Модуль является полем ввода (тег div) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.
 Как правило, является дочерним элементом, для модуля HtmlElementsRoot. Формат запросов и ответов смотри в его описании.
+На любой запрос опрашивает свои дочерние элементы (все подключенные контексты), передавая им объект с входящими параметрами и кешем.
+Ответы объединяет, формирует элемент <div> с дочерними элементами и возвращает в виде ответа.
+Если контекст 1, то рассматривает его как поставщик строкового значения (не элемента), который отрисовывает в теле как есть, если их больше 1 то рассматривает как полноценные элементы.
 Обрабатывает 2 типа запросов:
     get - отрисовывает себя - возвращает объект с html элементами и кешем данных.
     update - отрисовывает содержимое (аналогично get).

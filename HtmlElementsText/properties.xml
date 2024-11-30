@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <properties>
-    <uuid>HtmlElementsInput</uuid>
+    <uuid>HtmlElementsText</uuid>
     <provider>python</provider>
-    <ver>1.0.1</ver>
+    <ver>1.0.0</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
     <homePage>http://www.smcsystem.ru</homePage>
     <className>main.py::ModuleMain</className>
-    <categories>Python, Html, Nocode, Form, Input</categories>
+    <categories>Python, Html, Nocode, P</categories>
     <copyrightAndLicense>
         <entry>
             <key>en</key>
@@ -43,19 +43,6 @@ distributor are not responsible.
             </description>
         </value>
         <value>
-            <name>type</name>
-            <type>STRING</type>
-            <value>input</value>
-            <validValues>
-                <value>input</value>
-                <value>textarea</value>
-            </validValues>
-            <description>
-                <entry k="ru" v="Тип поля ввода."/>
-                <entry k="en" v="Input field type."/>
-            </description>
-        </value>
-        <value>
             <name>htmlHead</name>
             <type>STRING</type>
             <value></value>
@@ -86,21 +73,19 @@ distributor are not responsible.
     </defaultSettings>
 
     <types>
-        <type t="request" minS="1" maxS="1" minEC="0" maxEC="2" minC="0" maxC="0">
+        <type t="request" minS="1" maxS="1" minEC="0" maxEC="1" minC="0" maxC="0">
             <description>
                 <entry k="ru">
-                    <value><![CDATA[Каждый входящий запрос передается сюда и тут обрабатывается, на выход отдает объект с input/textarea-элементом, заголовками, скриптами и кешем данных.
-Если заданы контексты исполнения, то:
-    первый контекст рассматривает как функция инициализация значения. Она вызывается, если во входящем запросе нет кеша данных (нет предыдущего значения).
-    второй контекст рассматривает как функцию обработки пользовательского ввода (POST запрос).
-                 ]]></value>
+                    <value><![CDATA[Каждый входящий запрос передается сюда и тут обрабатывается, на выход отдает объект с p-элементом, заголовками, скриптами.
+Если есть контекст, то он всегда вызывается для получения строки, которая будут вставлена в элемент (тело).
+Если контекста нет, то используется поле text найденной фигуры или пустая строка.
+                    ]]></value>
                 </entry>
                 <entry k="en">
-                    <value><![CDATA[Each incoming request is passed here and processed here, and an object with an input/textarea element, headers, scripts, and data cache is returned as output.
-If execution contexts are specified, then:
-    the first context is considered as a function of value initialization. It is called if there is no data cache in the incoming request (no previous value).
-    the second context is considered as a function of user input processing (POST request).
-                 ]]></value>
+                    <value><![CDATA[Each incoming request is passed here and processed here, and an object with an p element, headers, scripts is returned as output.
+If there is a context, it is always called to get the string that will be inserted into the element (body).
+If there is no context, the text field of the found figure or an empty string is used.
+                    ]]></value>
                 </entry>
             </description>
             <sources>
@@ -109,15 +94,15 @@ If execution contexts are specified, then:
                     <elements>
                         <element t="VALUE" c="1" vt="OBJECT_ARRAY">
                             <value>
-                                <![CDATA[[{"type":"get", "cache":{"value":"123"}}]]]>
+                                <![CDATA[[{"type":"get", "cache":{}}]]]>
                             </value>
                             <description>
                                 <entry>
                                     <key>ru</key>
                                     <value><![CDATA[Сюда подается запрос в формате:
     type - строка - значения: get-запрос на отрисовку, update-запрос на ввод данных.
-    cache - кеш старых данных (в рамках текущей сессии). Это те самые данные которые возвращает сам модуль (поле data). Иными словами это способ сохранить данные между запросами в рамках одно сеанса.
-        У этого модуля есть только поле value, куда записывается текущее значение, которое выбирается из параметров с идентификатором, указанным в настройке id.
+    cache - кеш старых данных (в рамках текущей сессии). Это те самые данные которые возвращает сам модуль (поле data).
+        Иными словами это способ сохранить данные между запросами в рамках одно сеанса. У этого модуля нет данных.
     params - объект с полями для каждого параметра - передается поле params входящего объекта.
     headers - объект с полями для каждого заголовка - передается поле headers входящего объекта.
     multipart - массив объектов.
@@ -133,8 +118,8 @@ If execution contexts are specified, then:
                                     <key>ru</key>
                                     <value><![CDATA[A request is submitted here in the following format:
     type - string - values: get-request for rendering, update-request for data entry.
-    cache - cache of old data (within the current session). This is the same data that the module itself returns (data field). In other words, this is a way to save data between requests within a single session.
-        This module has only a value field, where the current value is written, which is selected from the parameters with the identifier specified in the id setting.
+    cache - cache of old data (within the current session). This is the same data that the module itself returns (data field).
+        In other words, this is a way to save data between requests within a single session. This module has no data.
     params - an object with fields for each parameter - the params field of the incoming object is passed.
     headers - an object with fields for each header - the headers field of the incoming object is passed.
     multipart - an array of objects.
@@ -154,7 +139,7 @@ If execution contexts are specified, then:
             <output>
                 <element t="VALUE" c="1" vt="OBJECT_ARRAY">
                     <value>
-                        <![CDATA[[{"type":"get", "htmlHead":"", "htmlBody":"", "htmlScript":"", "data":{"value":"123"}}]]]></value>
+                        <![CDATA[[{"type":"get", "htmlHead":"", "htmlBody":"", "htmlScript":""}]]]></value>
                     <description>
                         <entry k="ru">
                             <value><![CDATA[Возвращает объект с полями:
@@ -162,8 +147,6 @@ If execution contexts are specified, then:
     htmlHead - строка - вставляется в заголовок страницы.
     htmlBody - строка - вставляется в тело страницы.
     htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
-    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
-        У этого модуля есть только поле value, куда записывается текущее значение, которое выбирается из параметров с идентификатором, указанным в настройке id.
                          ]]></value>
                         </entry>
                         <entry k="en">
@@ -172,8 +155,6 @@ If execution contexts are specified, then:
     htmlHead - string - inserted into the page header.
     htmlBody - string - inserted into the page body.
     htmlScript - string - script, inserted at the end of the page body in the <script> tag.
-    data - object - data that will be saved and sent back with a new request within this session.
-        This module has only a value field, where the current value is written, which is selected from the parameters with the identifier specified in the id setting.
                          ]]></value>
                         </entry>
                     </description>
@@ -183,27 +164,14 @@ If execution contexts are specified, then:
                 <ec c="1" o="true">
                     <description>
                         <entry k="ru">
-                            <value>Если приходит запрос update, и есть этот контекст, то он вызывается. Ему передаются новое значение.</value>
+                            <value>Вызывается при каждом значение и возвращаемое значение вставляется в тело элемента.</value>
                         </entry>
                         <entry k="en">
-                            <value>If an update request comes in, and this context exists, it is called. It is given a new meaning.</value>
+                            <value>Called on every value and the return value is inserted into the element's body.</value>
                         </entry>
                     </description>
                     <elements>
-                        <element t="VALUE" c="1" vt="STRING" v="value1"/>
-                    </elements>
-                </ec>
-                <ec c="1" o="true">
-                    <description>
-                        <entry k="ru">
-                            <value>Если приходит запрос update, и есть этот контекст, то он вызывается. Ему передаются новое значение.</value>
-                        </entry>
-                        <entry k="en">
-                            <value>If an update request comes in, and this context exists, it is called. It is given a new meaning.</value>
-                        </entry>
-                    </description>
-                    <elements>
-                        <element t="VALUE" c="1" vt="STRING" v="value1"/>
+                        <element t="VALUE" c="1" vt="STRING" v="Hello world!"/>
                     </elements>
                 </ec>
             </ecs>
@@ -216,41 +184,45 @@ If execution contexts are specified, then:
     <description>
         <entry>
             <key>en</key>
-            <value><![CDATA[The module is an input field (tag <input> or <textarea>) and is part of a set of modules that allow you to create web pages in the no-code style.]]></value>
+            <value>The module is an input field (tag p) and is part of a set of modules that allow you to create web pages in the no-code
+                style.
+            </value>
         </entry>
         <entry>
             <key>ru</key>
-            <value><![CDATA[Модуль является полем ввода (тег <input> или <textarea>) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.]]></value>
+            <value>Модуль является полем ввода (тег p) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле
+                no-code.
+            </value>
         </entry>
     </description>
 
     <help>
         <entry>
             <key>en</key>
-            <value><![CDATA[The module is an input field (tag <input> or <textarea>) and is part of a set of modules that allow you to create web pages in the no-code style.
-As a rule, it is a child element for the HtmlElementsForm module. For the format of requests and responses, see its description.
+            <value><![CDATA[The module is an input field (tag p) and is part of a set of modules that allow you to create web pages in the no-code style.
+As a rule, it is a child element for the HtmlElementsRoot module. For the format of requests and responses, see its description.
 Processes 2 types of requests:
     get - renders itself - returns an object with html elements and a data cache.
-    update - if there is one, calls the first context passing the input parameter (id is specified), then updates the internal representation and then renders the content (similar to get).
-If you specify id, then at startup it will look for a figure (rectangle) with this value in the description.
-If it finds one, it will use its coordinates to calculate its position on the page.
+    update - renders the content (similar to get).
+If you specify an id, then at startup it will look for a figure (text) with this value in the description.
+If it finds one, it will use its coordinates to calculate its position on the page, as well as its text and fontSize fields.
             ]]></value>
         </entry>
         <entry>
             <key>ru</key>
-            <value><![CDATA[Модуль является полем ввода (тег <input> или <textarea>) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.
-Как правило, является дочерним элементом, для модуля HtmlElementsForm. Формат запросов и ответов смотри в его описании.
+            <value><![CDATA[Модуль является полем ввода (тег p) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.
+Как правило, является дочерним элементом, для модуля HtmlElementsRoot. Формат запросов и ответов смотри в его описании.
 Обрабатывает 2 типа запросов:
     get - отрисовывает себя - возвращает объект с html элементами и кешем данных.
-    update - если есть, вызывает первый контекст передавая входящий параметр (задается id), далее обновляет внутреннее представление и затем отрисовывает содержимое (аналогично get).
-Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
-Если найдет, то будет использовать его координаты для вычисления положения себя на странице.
+    update - отрисовывает содержимое (аналогично get).
+Если задать id, то при старте будет искать фигуру (text) с этим значением в описании.
+Если найдет, то будет использовать его координаты для вычисления положения себя на странице, а так его поля text и fontSize.
 ]]></value>
         </entry>
     </help>
 
     <examples/>
     <icon>
-        <![CDATA[iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABe0lEQVR4nO2YTU7DMBCFvxWsQGwS8XMoENfg55DNoqRqUQWV4BzA3qjSVLJCHHDbicfFTxopi2RmXt7E9gsU/D+0wJQDgJPIHq4QMYaiiDUURayhKGINWSkyAeZAHUGklmdMHV9m0uxrD5k+IrXc6+RZM6iAF2nsDbgYINK99xxjqAJkfCLmSQyR2RDJhoQ//yvvm3Gd677vyCwq7+37kYUSv5EZjUTT8wY38SXr/T1wtMWYrSLH6Rh4AJ6kdqivJpaIH8/AZSSZGBJXwPKPvaw34iicADfAuyRYRCoTo8TSG8Vrqb13nHlk7hTyP3ok1rVUcSvFpkq/jpwooY5TKfahkPtTcquM05hHczf2kb8QSaXIJGCYQh5jEdqkdsw733VxCRmmbkHfKLVKeWcWPUYS71IpeYwk3qXu+Il9eQytvEk8RhLvUil5jCTepd7SY4yWt41Yq2M9Bgp5m9CeldWvTQb6LUQSwRVFjMEVRXJTxGUWP3AwRAowgG9vZGsPHx374wAAAABJRU5ErkJggg==]]></icon>
+        <![CDATA[iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACTElEQVR4nO2YzYtOURzHP/I6eU+zohlK42XhbWE9U2xkwUZeUpIi8TdYKCEbsbQgK1Eys0AWyoSkRJGSQokiZjHeEo5+9X3qLp5zn+t57r3ze3S+dVa/8z3n97nn3nN+50JS0oTpNhBKaD+At8AT4CZwFBgCZtQFEipuX4DTQF9dIJ1qOrAQWAVsBk4CD4HfGv8ncBaYhXOQmFYCFwQSgBfAQDeCNLRGEDbXBwF2JYhpjjYCm+8NsKBOkLsFPuhPwHPgIrAH6MkZbzbwWL7LdYK0s1PZq7M3Z8w+4Kv6DtUNkqf5wGpgP3A/47FdKqZj6nOrzbz/OdF2vqGdOj/MdzjSZ576/AH6cQpi2irfmJJupuEWsC5ATNdbJHpA8Us4B9kl77VIfL3iVp+5Blki76tIvF/xzzgHmSnveCTek6nDXIM0ErUzo5nmKv4d5yCL5X0diQ8o/h7nIDvkHYnEBxW3Msg1yA15D0XiRxQ/g2OQbZmC0r6FZnqgPltwCmIF4zf5rP5qphW6PY6Vda/vFGSS7hXrdII/ynhO5fiuqs+JDnKvvIx/B2zPGXNj5iDsrQtktEXSVr1+BJ4C51X5TssZb5kAzLuvLIgiIGVqOfBS89kPCboRxFZqXHNZ+T6120A2APcyr+FxYHIVE5UFYlvoImCtnv45lSaN8e1X0CYqVBl/UfLaM2A3MKVKiCIgRRP+pd3Idq8rwEFgadXJ11Vr1aqQQJwppBVxppBWxJlCWhFnCmlFnCn8bysSWjT3Gi0AcWeik0xKohr9Bb8gf6evv3erAAAAAElFTkSuQmCC]]></icon>
 
 </properties>

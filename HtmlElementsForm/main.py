@@ -9,9 +9,9 @@ class InputObj:
     def __init__(self, objectElement):
         # type: (SMCApi.ObjectElement) -> None
         self.type = SmcUtils.getStringField(objectElement.findField("type"))
-        self.params = SmcUtils.getObjectElement(objectElement.findField("inputParams"))
-        self.headers = SmcUtils.getObjectElement(objectElement.findField("inputHeaders"))
-        self.multipart = SmcUtils.getObjectArrayField(objectElement.findField("inputMultipart"))
+        self.params = SmcUtils.getObjectElement(objectElement.findField("params"))
+        self.headers = SmcUtils.getObjectElement(objectElement.findField("headers"))
+        self.multipart = SmcUtils.getObjectArrayField(objectElement.findField("multipart"))
         cache = SmcUtils.getObjectElement(objectElement.findField("cache"))
         self.cache = None  # type: List[SMCApi.ObjectElement]
         if cache:
@@ -20,6 +20,18 @@ class InputObj:
                 self.cache = []  # type: List[SMCApi.ObjectElement]
                 for i in range(objectArray.size()):
                     self.cache.append(objectArray.get(i))
+
+
+class HtmlElementsOutput:
+    def __init__(self, objectElement):
+        # type: (SMCApi.ObjectElement) -> None
+        self.id = SmcUtils.toStringField(objectElement.findField("id"))
+        self.htmlHead = SmcUtils.toStringField(objectElement.findField("htmlHead"))
+        self.htmlBody = SmcUtils.toStringField(objectElement.findField("htmlBody"))
+        self.htmlScript = SmcUtils.toStringField(objectElement.findField("htmlScript"))
+        self.data = SmcUtils.toObjectElementField(objectElement.findField("data"))
+        if len(self.data.fields) == 0:
+            self.data = None  # type: SMCApi.ObjectElement
 
 
 class Shape:
@@ -37,14 +49,15 @@ class Shape:
         self.offset2Y = None  # type: int
         if 'offset2Y' in keys:
             self.offset2Y = obj.offset2Y  # type: int
-        self.color = obj.color  # type: int
+        self.color = obj.color & 0xffffff  # type: int
         self.strokeWidth = obj.strokeWidth  # type: int
-        self.description = obj.description  # type: str
-        self.descriptionList = []  # type: List[str]
-        if self.description:
-            self.descriptionList = map(lambda s: s.strip(), filter(lambda s: s and s.strip(), self.description.strip().split(" ")))
-        if len(self.descriptionList) == 0:
-            self.descriptionList.append("")
+        self.descriptionId = ""
+        self.descriptionOther = ""
+        if obj.description:
+            arrStr = obj.description.strip().split(" ", 2)
+            self.descriptionId = arrStr[0].strip()
+            if len(arrStr) > 1:
+                self.descriptionOther = arrStr[1].strip()
         self.text = None  # type: str
         if 'text' in keys:
             self.text = obj.text  # type: str
@@ -54,18 +67,9 @@ class Shape:
         self.imageBytes = None  # type: bytes
         if 'imageBytes' in keys:
             self.imageBytes = obj.imageBytes  # type: bytes
-
-
-class HtmlElementsOutput:
-    def __init__(self, objectElement):
-        # type: (SMCApi.ObjectElement) -> None
-        self.id = SmcUtils.toStringField(objectElement.findField("id"))
-        self.htmlHead = SmcUtils.toStringField(objectElement.findField("htmlHead"))
-        self.htmlBody = SmcUtils.toStringField(objectElement.findField("htmlBody"))
-        self.htmlScript = SmcUtils.toStringField(objectElement.findField("htmlScript"))
-        self.data = SmcUtils.toObjectElementField(objectElement.findField("data"))
-        if len(self.data.fields) == 0:
-            self.data = None  # type: SMCApi.ObjectElement
+        self.fontSize = None  # type: int
+        if 'fontSize' in keys:
+            self.fontSize = obj.fontSize  # type: int
 
 
 class ModuleMain(SMCApi.Module):
@@ -88,7 +92,7 @@ class ModuleMain(SMCApi.Module):
             objList = map(lambda s: Shape(s), SmcUtils.convertFromObjectArray(objectArray, True))  # type: List[Shape]
             shape = next(iter(
                 filter(
-                    lambda s: s.type == "rectangle" and s.descriptionList[0].startswith(self.id), objList)))  # type: Shape
+                    lambda s: s.type == "rectangle" and s.descriptionId == self.id, objList)))  # type: Shape
             if shape:
                 shapeParent = next(iter(
                     sorted(
@@ -115,8 +119,8 @@ class ModuleMain(SMCApi.Module):
             if shapeParent:
                 parentPositionX = shapeParent.point1X
                 parentPositionY = shapeParent.point1Y
-            if len(shape.descriptionList) > 1:
-                self.elementAttrs = ' '.join(shape.descriptionList[1:])
+            if shape.descriptionOther:
+                self.elementAttrs = shape.descriptionOther
             configurationTool.loggerDebug(
                 "Find shape %s %d:%d, parent: %d:%d" % (self.id, shape.point1X, shape.point1Y, parentPositionX, parentPositionY))
 
@@ -172,8 +176,10 @@ if(element){
                     paramObjCopy.fields = paramObj.fields[:]
                     if inputObj.cache and len(inputObj.cache) > i and inputObj.cache[i]:
                         paramObjCopy.fields.append(SMCApi.ObjectField("cache", inputObj.cache[i]))
-                    dataList.append(HtmlElementsOutput(SmcUtils.executeAndGetElement(
-                        executionContextTool, i + 1, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])))
+                    resultElement = SmcUtils.executeAndGetElement(
+                        executionContextTool, i + 1, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])
+                    if resultElement:
+                        dataList.append(HtmlElementsOutput(resultElement))
             elif inputObj.type == "update":
                 resultCommand = None  # type: SMCApi.ICommand
                 if (executionContextTool.getFlowControlTool().countManagedExecutionContexts() > 0 and inputObj.params and
@@ -198,10 +204,18 @@ if(element){
                 for i in range(executionContextTool.getFlowControlTool().countManagedExecutionContexts() - 1):
                     paramObjCopy = SMCApi.ObjectElement()
                     paramObjCopy.fields = paramObj.fields[:]
+                    if inputObj.params:
+                        paramObjCopy.fields.append(SMCApi.ObjectField("params", inputObj.params))
+                    if inputObj.headers:
+                        paramObjCopy.fields.append(SMCApi.ObjectField("headers", inputObj.headers))
+                    if inputObj.multipart:
+                        paramObjCopy.fields.append(SMCApi.ObjectField("multipart", inputObj.multipart))
                     if inputObj.cache and len(inputObj.cache) > i and inputObj.cache[i]:
                         paramObjCopy.fields.append(SMCApi.ObjectField("cache", inputObj.cache[i]))
-                    dataList.append(HtmlElementsOutput(SmcUtils.executeAndGetElement(
-                        executionContextTool, i + 1, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])))
+                    resultElement = SmcUtils.executeAndGetElement(
+                        executionContextTool, i + 1, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])
+                    if resultElement:
+                        dataList.append(HtmlElementsOutput(resultElement))
                 if error is None:
                     # if update succeess - get empty values
                     dataList = []
@@ -211,8 +225,10 @@ if(element){
                         fieldType = paramObjCopy.findField("type")
                         if fieldType:
                             fieldType.setValue("get")
-                        dataList.append(HtmlElementsOutput(SmcUtils.executeAndGetElement(
-                            executionContextTool, i + 1, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])))
+                        resultElement = SmcUtils.executeAndGetElement(
+                            executionContextTool, i + 1, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])
+                        if resultElement:
+                            dataList.append(HtmlElementsOutput(resultElement))
 
             executionContextTool.addMessage(self.genResponse(dataList, error))
 

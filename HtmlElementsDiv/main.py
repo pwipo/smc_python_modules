@@ -5,6 +5,35 @@ import SmcUtils
 from typing import List
 
 
+class InputObj:
+    def __init__(self, objectElement):
+        # type: (SMCApi.ObjectElement) -> None
+        self.type = SmcUtils.getStringField(objectElement.findField("type"))
+        self.params = SmcUtils.getObjectElement(objectElement.findField("params"))
+        self.headers = SmcUtils.getObjectElement(objectElement.findField("headers"))
+        self.multipart = SmcUtils.getObjectArrayField(objectElement.findField("multipart"))
+        cache = SmcUtils.getObjectElement(objectElement.findField("cache"))
+        self.cache = None  # type: List[SMCApi.ObjectElement]
+        if cache:
+            objectArray = SmcUtils.getObjectArrayField(cache.findField("data"))
+            if SmcUtils.isArrayContainObjectElements(objectArray):
+                self.cache = []  # type: List[SMCApi.ObjectElement]
+                for i in range(objectArray.size()):
+                    self.cache.append(objectArray.get(i))
+
+
+class HtmlElementsOutput:
+    def __init__(self, objectElement):
+        # type: (SMCApi.ObjectElement) -> None
+        self.id = SmcUtils.toStringField(objectElement.findField("id"))
+        self.htmlHead = SmcUtils.toStringField(objectElement.findField("htmlHead"))
+        self.htmlBody = SmcUtils.toStringField(objectElement.findField("htmlBody"))
+        self.htmlScript = SmcUtils.toStringField(objectElement.findField("htmlScript"))
+        self.data = SmcUtils.toObjectElementField(objectElement.findField("data"))
+        if len(self.data.fields) == 0:
+            self.data = None  # type: SMCApi.ObjectElement
+
+
 class Shape:
     def __init__(self, obj):
         # type: (SmcUtils.ObjectDict) -> None
@@ -20,14 +49,15 @@ class Shape:
         self.offset2Y = None  # type: int
         if 'offset2Y' in keys:
             self.offset2Y = obj.offset2Y  # type: int
-        self.color = obj.color  # type: int
+        self.color = obj.color & 0xffffff  # type: int
         self.strokeWidth = obj.strokeWidth  # type: int
-        self.description = obj.description  # type: str
-        self.descriptionList = []  # type: List[str]
-        if self.description:
-            self.descriptionList = map(lambda s: s.strip(), filter(lambda s: s and s.strip(), self.description.strip().split(" ")))
-        if len(self.descriptionList) == 0:
-            self.descriptionList.append("")
+        self.descriptionId = ""
+        self.descriptionOther = ""
+        if obj.description:
+            arrStr = obj.description.strip().split(" ", 2)
+            self.descriptionId = arrStr[0].strip()
+            if len(arrStr) > 1:
+                self.descriptionOther = arrStr[1].strip()
         self.text = None  # type: str
         if 'text' in keys:
             self.text = obj.text  # type: str
@@ -37,6 +67,9 @@ class Shape:
         self.imageBytes = None  # type: bytes
         if 'imageBytes' in keys:
             self.imageBytes = obj.imageBytes  # type: bytes
+        self.fontSize = None  # type: int
+        if 'fontSize' in keys:
+            self.fontSize = obj.fontSize  # type: int
 
 
 class ModuleMain(SMCApi.Module):
@@ -59,7 +92,7 @@ class ModuleMain(SMCApi.Module):
             objList = map(lambda s: Shape(s), SmcUtils.convertFromObjectArray(objectArray, True))  # type: List[Shape]
             shape = next(iter(
                 filter(
-                    lambda s: s.type == "rectangle" and s.descriptionList[0].startswith(self.id), objList)))  # type: Shape
+                    lambda s: s.type == "rectangle" and s.descriptionId == self.id, objList)))  # type: Shape
             if shape:
                 shapeParent = next(iter(
                     sorted(
@@ -77,6 +110,7 @@ class ModuleMain(SMCApi.Module):
         position2Y = 130
         parentPositionX = 1
         parentPositionY = 1
+        styles = "overflow: auto;"
         self.elementAttrs = ""
         if shape:
             position1X = shape.point1X
@@ -86,16 +120,16 @@ class ModuleMain(SMCApi.Module):
             if shapeParent:
                 parentPositionX = shapeParent.point1X
                 parentPositionY = shapeParent.point1Y
-            if len(shape.descriptionList) > 1:
-                self.elementAttrs = ' '.join(shape.descriptionList[1:])
-            styleBackgroundColor = ""
+            if shape.descriptionOther:
+                self.elementAttrs = shape.descriptionOther
+            styles += "border-style: solid; border-width: %dpx; border-color: #%s;" % (
+                shape.strokeWidth, '{0:06X}'.format(shape.color))
             if shape.filled:
-                styleBackgroundColor = "background-color: #" + '{0:06X}'.format(shape.color) + ";"
-            self.elementAttrs += " style=\"border-style: solid; border-width: %dpx; border-color: #%s; %s \"" % (
-                shape.strokeWidth, '{0:06X}'.format(shape.color), styleBackgroundColor)
+                styles += " background-color: #%s;" % '{0:06X}'.format(shape.color)
             configurationTool.loggerDebug(
                 "Find shape %s %d:%d, parent: %d:%d" % (self.id, shape.point1X, shape.point1Y, parentPositionX, parentPositionY))
 
+        self.elementAttrs += " style=\"%s\"" % styles
         self.htmlScript = """
 var elementId = "%s";
 var element = document.getElementById(elementId);
@@ -128,24 +162,90 @@ if(element){
         # type: (SMCApi.ConfigurationTool, SMCApi.ExecutionContextTool, List[List[SMCApi.IMessage]]) -> None
         type = executionContextTool.getType().lower()
         if type == "request":
-            value = ""
-            if executionContextTool.getFlowControlTool().countManagedExecutionContexts() > 0:
+            objectArray = SmcUtils.deserializeToObject(messages[0])
+            inputObj = None  # type: InputObj
+            if SmcUtils.isArrayContainObjectElements(objectArray):
+                inputObj = InputObj(objectArray.get(0))
+            if inputObj is None or inputObj.type is None:
+                executionContextTool.addError("wrong input format")
+                return
+
+            dataList = []  # type: List[HtmlElementsOutput]
+            paramObj = SMCApi.ObjectElement()
+            paramObj.fields.append(SMCApi.ObjectField("type", inputObj.type))
+
+            configurationTool.loggerTrace("request type=%s" % (inputObj.type))
+
+            value = None
+            if executionContextTool.getFlowControlTool().countManagedExecutionContexts() == 1:
                 lst = SmcUtils.executeAndGetMessages(executionContextTool, 0, [])
                 if lst and len(lst) > 0:
                     value = '<br/>'.join(map(lambda m: SmcUtils.toString(m), lst))
-            executionContextTool.addMessage(self.genResponse(value))
+            elif executionContextTool.getFlowControlTool().countManagedExecutionContexts() > 1:
+                if inputObj.type == "get":
+                    for i in range(executionContextTool.getFlowControlTool().countManagedExecutionContexts()):
+                        paramObjCopy = SMCApi.ObjectElement()
+                        paramObjCopy.fields = paramObj.fields[:]
+                        if inputObj.cache and len(inputObj.cache) > i and inputObj.cache[i]:
+                            paramObjCopy.fields.append(SMCApi.ObjectField("cache", inputObj.cache[i]))
+                        resultElement = SmcUtils.executeAndGetElement(
+                            executionContextTool, i, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])
+                        if resultElement:
+                            dataList.append(HtmlElementsOutput(resultElement))
+                elif inputObj.type == "update":
+                    for i in range(executionContextTool.getFlowControlTool().countManagedExecutionContexts()):
+                        paramObjCopy = SMCApi.ObjectElement()
+                        paramObjCopy.fields = paramObj.fields[:]
+                        if inputObj.params:
+                            paramObjCopy.fields.append(SMCApi.ObjectField("params", inputObj.params))
+                        if inputObj.headers:
+                            paramObjCopy.fields.append(SMCApi.ObjectField("headers", inputObj.headers))
+                        if inputObj.multipart:
+                            paramObjCopy.fields.append(SMCApi.ObjectField("multipart", inputObj.multipart))
+                        if inputObj.cache and len(inputObj.cache) > i and inputObj.cache[i]:
+                            paramObjCopy.fields.append(SMCApi.ObjectField("cache", inputObj.cache[i]))
+                        resultElement = SmcUtils.executeAndGetElement(
+                            executionContextTool, i, [SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [paramObjCopy])])
+                        if resultElement:
+                            dataList.append(HtmlElementsOutput(resultElement))
 
-    def genResponse(self, value):
-        # type: (str) -> SMCApi.ObjectArray
+            executionContextTool.addMessage(self.genResponse(dataList, value))
+
+    def genResponse(self, dataList, value):
+        # type: (List[HtmlElementsOutput], str) -> SMCApi.ObjectArray
+        htmlHeadList = []  # type: List[str]
+        if self.htmlHead:
+            htmlHeadList.append(self.htmlHead)
+        htmlBodyList = []  # type: List[str]
+        htmlScriptList = []  # type: List[str]
+        if self.htmlScript:
+            htmlScriptList.append(self.htmlScript)
+        dataChilds = []  # type: List[SMCApi.ObjectElement]
+
+        for dataChild in dataList:
+            if dataChild.htmlHead:
+                htmlHeadList.append(dataChild.htmlHead)
+            if dataChild.htmlBody:
+                htmlBodyList.append(dataChild.htmlBody)
+            if dataChild.htmlScript:
+                htmlScriptList.append(dataChild.htmlScript)
+            if dataChild.data:
+                dataChilds.append(dataChild.data)
+            else:
+                dataChilds.append(SMCApi.ObjectElement())
+
+        if value is None:
+            value = '\n'.join(htmlBodyList)
         objOutput = SMCApi.ObjectElement([
             SMCApi.ObjectField("id", self.id),
-            SMCApi.ObjectField("htmlHead", self.htmlHead),
-            SMCApi.ObjectField("htmlScript", self.htmlScript),
+            SMCApi.ObjectField("htmlHead", '\n'.join(htmlHeadList)),
+            SMCApi.ObjectField("htmlBody",
+                               "<div id=\"%s\" %s >\n%s\n</div>" %
+                               (self.id, self.elementAttrs, value)),
+            SMCApi.ObjectField("htmlScript", '\n'.join(htmlScriptList)),
         ])
-        objOutput.fields.append(SMCApi.ObjectField(
-            "htmlBody",
-            "<div id=\"%s\" %s >%s</div>" %
-            (self.id, self.elementAttrs, value)))
+        if dataChilds:
+            SMCApi.ObjectField("data", SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, dataChilds))
         return SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [objOutput])
 
     def update(self, configurationTool):

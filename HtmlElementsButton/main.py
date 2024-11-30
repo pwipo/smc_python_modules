@@ -20,14 +20,15 @@ class Shape:
         self.offset2Y = None  # type: int
         if 'offset2Y' in keys:
             self.offset2Y = obj.offset2Y  # type: int
-        self.color = obj.color  # type: int
+        self.color = obj.color & 0xffffff # type: int
         self.strokeWidth = obj.strokeWidth  # type: int
-        self.description = obj.description  # type: str
-        self.descriptionList = []  # type: List[str]
-        if self.description:
-            self.descriptionList = map(lambda s: s.strip(), filter(lambda s: s and s.strip(), self.description.strip().split(" ")))
-        if len(self.descriptionList) == 0:
-            self.descriptionList.append("")
+        self.descriptionId = ""
+        self.descriptionOther = ""
+        if obj.description:
+            arrStr = obj.description.strip().split(" ", 2)
+            self.descriptionId = arrStr[0].strip()
+            if len(arrStr) > 1:
+                self.descriptionOther = arrStr[1].strip()
         self.text = None  # type: str
         if 'text' in keys:
             self.text = obj.text  # type: str
@@ -37,6 +38,9 @@ class Shape:
         self.imageBytes = None  # type: bytes
         if 'imageBytes' in keys:
             self.imageBytes = obj.imageBytes  # type: bytes
+        self.fontSize = None  # type: int
+        if 'fontSize' in keys:
+            self.fontSize = obj.fontSize  # type: int
 
 
 class ModuleMain(SMCApi.Module):
@@ -62,7 +66,7 @@ class ModuleMain(SMCApi.Module):
             objList = map(lambda s: Shape(s), SmcUtils.convertFromObjectArray(objectArray, True))  # type: List[Shape]
             shape = next(iter(
                 filter(
-                    lambda s: s.type == "rectangle" and s.descriptionList[0].startswith(self.id), objList)))  # type: Shape
+                    lambda s: s.type == "rectangle" and s.descriptionId == self.id, objList)))  # type: Shape
             if shape:
                 shapeParent = next(iter(
                     sorted(
@@ -80,6 +84,7 @@ class ModuleMain(SMCApi.Module):
         position2Y = 130
         parentPositionX = 1
         parentPositionY = 1
+        styles = ""
         self.elementAttrs = ""
         self.text = "button"
         if shape:
@@ -90,17 +95,18 @@ class ModuleMain(SMCApi.Module):
             if shapeParent:
                 parentPositionX = shapeParent.point1X
                 parentPositionY = shapeParent.point1Y
-            if len(shape.descriptionList) > 1:
-                self.elementAttrs = ' '.join(shape.descriptionList[1:])
-            styleBackgroundColor = ""
+            if shape.descriptionOther:
+                self.elementAttrs = shape.descriptionOther
+            styles += "border-style: solid; border-width: %dpx; border-color: #%s;" % (
+                shape.strokeWidth, '{0:06X}'.format(shape.color))
             if shape.filled:
-                styleBackgroundColor = "background-color: #" + '{0:06X}'.format(shape.color) + ";"
-            self.elementAttrs += " style=\"border-style: solid; border-width: %dpx; border-color: #%s; %s \"" % (
-                shape.strokeWidth, '{0:06X}'.format(shape.color), styleBackgroundColor)
-            self.text = shape.text
+                styles += " background-color: #%s;" % '{0:06X}'.format(shape.color)
+            if shape.text:
+                self.text = shape.text
             configurationTool.loggerDebug(
                 "Find shape %s %d:%d, parent: %d:%d" % (self.id, shape.point1X, shape.point1Y, parentPositionX, parentPositionY))
 
+        self.elementAttrs += " style=\"%s\"" % styles
         self.htmlScript = """
 var elementId = "%s";
 var element = document.getElementById(elementId);
