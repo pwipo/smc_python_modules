@@ -2,7 +2,7 @@
 <properties>
     <uuid>HtmlElementsForm</uuid>
     <provider>python</provider>
-    <ver>1.0.1</ver>
+    <ver>1.0.2</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
@@ -114,7 +114,7 @@ The remaining contexts are child elements, the format of which is similar to oth
                                     ]]></value>
                                 </entry>
                                 <entry>
-                                    <key>ru</key>
+                                    <key>en</key>
                                     <value><![CDATA[A request is submitted here in the following format:
     type - string - values: get-request for rendering, update-request for data entry.
     cache - cache of old data (within the current session). This is the same data that the module itself returns (data field). In other words, this is a way to save data between requests within a single session.
@@ -195,7 +195,7 @@ The entire incoming object is passed to itexcept the cache. If it returns an err
                                     ]]></value>
                                 </entry>
                                 <entry>
-                                    <key>ru</key>
+                                    <key>en</key>
                                     <value><![CDATA[The request, supplemented by the cache, is submitted here. Format:
     type - string - values: get, update. get - only display data (GET), update - change and display (POST).
     params - object with fields for each parameter - the params field of the incoming object is passed.
@@ -270,7 +270,7 @@ In other words, first new data is sent for processing, and then an empty form is
                                     ]]></value>
                                 </entry>
                                 <entry>
-                                    <key>ru</key>
+                                    <key>en</key>
                                     <value><![CDATA[The request, supplemented by the cache, is submitted here. Format:
     type - string - values: get, update. get - only display data (GET), update - change and display (POST).
     cache - array of objects - cache with old data (within this session) from all child elements.
@@ -318,7 +318,7 @@ In other words, first new data is sent for processing, and then an empty form is
         <entry>
             <key>en</key>
             <value><![CDATA[The module is a form (<form> tag) and is part of a set of modules that allow you to create web pages in the no-code style.
-Typically, it is a child element of the HtmlElementsRoot module. For the format of requests and responses, see its description.
+Typically, it is a child element of the HtmlElementsRoot or HtmlElementsDiv module. For the format of requests and responses, see its description.
 Operation algorithm.
 For any request, it polls its child elements (all connected contexts), passing them an object with incoming parameters and a cache.
 It combines the responses, forms a <form> element and returns it as a response.
@@ -328,12 +328,13 @@ Processes 2 types of requests:
     update - updates the internal representation and then renders the content.
 If you specify an id, then at startup it will look for a figure (rectangle) with this value in the description.
 If it finds one, it will use its coordinates to calculate its position on the page.
+The rest of the description is considered additional attributes and is inserted into the tag directly.
             ]]></value>
         </entry>
         <entry>
             <key>ru</key>
             <value><![CDATA[Модуль является формой (тег <form>) и входит в состав набора модулей, которые позволяют создавать веб страницы в стиле no-code.
-Как правило, является дочерним элементом, для модуля HtmlElementsRoot. Формат запросов и ответов смотри в его описании.
+Как правило, является дочерним элементом, для модуля HtmlElementsRoot или HtmlElementsDiv. Формат запросов и ответов смотри в его описании.
 Алгоритм работы.
 На любой запрос опрашивает свои дочерние элементы (все подключенные контексты), передавая им объект с входящими параметрами и кешем.
 Ответы объединяет, формирует элемент <form> и возвращает в виде ответа.
@@ -343,6 +344,7 @@ If it finds one, it will use its coordinates to calculate its position on the pa
     update - обновляет внутреннее представление и затем отрисовывает содержимое.
 Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
 Если найдет, то будет использовать его координаты для вычисления положения себя на странице.
+Оставшаяся часть описания рассматривается как дополнительные атрибуты и вставляется в тег напряму.
 ]]></value>
         </entry>
     </help>

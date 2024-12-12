@@ -2,7 +2,7 @@
 <properties>
     <uuid>HtmlElementsRoot</uuid>
     <provider>python</provider>
-    <ver>1.0.1</ver>
+    <ver>1.0.2</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
@@ -114,7 +114,7 @@ distributor are not responsible.
                                     ]]></value>
                                 </entry>
                                 <entry>
-                                    <key>ru</key>
+                                    <key>en</key>
                                     <value><![CDATA[A request is submitted here in a format similar to that issued by the HttpServer module.
 In other words, you can directly connect this module to the web server. For format details, see the HttpServer description.
 Fields: method,reqId,uri,remoteAddr,sessionId,params,headers,multipart,size,data.
@@ -198,7 +198,7 @@ Returns an object with fields:
                                     ]]></value>
                                 </entry>
                                 <entry>
-                                    <key>ru</key>
+                                    <key>en</key>
                                     <value><![CDATA[The request, supplemented by the cache, is submitted here. Format:
     type - string - values: get, update. get - only display data (GET), update - change and display (POST).
     cache - object - cache with old data (within this session) of this child element. This is what was returned in the data field.

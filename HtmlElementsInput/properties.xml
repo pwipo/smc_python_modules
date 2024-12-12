@@ -2,7 +2,7 @@
 <properties>
     <uuid>HtmlElementsInput</uuid>
     <provider>python</provider>
-    <ver>1.0.1</ver>
+    <ver>1.0.2</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
@@ -130,7 +130,7 @@ If execution contexts are specified, then:
                                     ]]></value>
                                 </entry>
                                 <entry>
-                                    <key>ru</key>
+                                    <key>en</key>
                                     <value><![CDATA[A request is submitted here in the following format:
     type - string - values: get-request for rendering, update-request for data entry.
     cache - cache of old data (within the current session). This is the same data that the module itself returns (data field). In other words, this is a way to save data between requests within a single session.
@@ -234,6 +234,7 @@ Processes 2 types of requests:
     update - if there is one, calls the first context passing the input parameter (id is specified), then updates the internal representation and then renders the content (similar to get).
 If you specify id, then at startup it will look for a figure (rectangle) with this value in the description.
 If it finds one, it will use its coordinates to calculate its position on the page.
+The rest of the description is considered additional attributes and is inserted into the tag directly.
             ]]></value>
         </entry>
         <entry>
@@ -245,6 +246,7 @@ If it finds one, it will use its coordinates to calculate its position on the pa
     update - если есть, вызывает первый контекст передавая входящий параметр (задается id), далее обновляет внутреннее представление и затем отрисовывает содержимое (аналогично get).
 Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
 Если найдет, то будет использовать его координаты для вычисления положения себя на странице.
+Оставшаяся часть описания рассматривается как дополнительные атрибуты и вставляется в тег напряму.
 ]]></value>
         </entry>
     </help>

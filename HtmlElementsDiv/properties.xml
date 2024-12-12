@@ -2,7 +2,7 @@
 <properties>
     <uuid>HtmlElementsDiv</uuid>
     <provider>python</provider>
-    <ver>1.0.1</ver>
+    <ver>1.0.2</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
@@ -115,7 +115,7 @@ If there are more than 1, then it is considered as full elements.
                                     ]]></value>
                                 </entry>
                                 <entry>
-                                    <key>ru</key>
+                                    <key>en</key>
                                     <value><![CDATA[A request is submitted here in the following format:
     type - string - values: get-request for rendering, update-request for data entry.
     cache - cache of old data (within the current session). This is the same data that the module itself returns (data field).
@@ -236,7 +236,7 @@ In other words, first new data is sent for processing, and then an empty form is
                                     ]]></value>
                                 </entry>
                                 <entry>
-                                    <key>ru</key>
+                                    <key>en</key>
                                     <value><![CDATA[The request, supplemented by the cache, is submitted here. Format:
     type - string - values: get, update. get - only display data (GET), update - change and display (POST).
     cache - array of objects - cache with old data (within this session) from all child elements.
@@ -296,6 +296,7 @@ Processes 2 types of requests:
     update - renders the content (similar to get).
 If you specify an id, then at startup it will look for a figure (rectangle) with this value in the description.
 If it finds one, it will use its coordinates to calculate its position on the page.
+The rest of the description is considered additional attributes and is inserted into the tag directly.
             ]]></value>
         </entry>
         <entry>
@@ -310,6 +311,7 @@ If it finds one, it will use its coordinates to calculate its position on the pa
     update - отрисовывает содержимое (аналогично get).
 Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
 Если найдет, то будет использовать его координаты для вычисления положения себя на странице.
+Оставшаяся часть описания рассматривается как дополнительные атрибуты и вставляется в тег напряму.
 ]]></value>
         </entry>
     </help>
