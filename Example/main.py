@@ -4,6 +4,8 @@ import random
 
 import SMCApi
 import camelcase
+# import jnumeric
+import numpy as np
 
 
 class ModuleMain(SMCApi.Module):
@@ -35,6 +37,11 @@ class ModuleMain(SMCApi.Module):
                 break
         if self.fileTextValue is None:
             raise SMCApi.ModuleException("file text.txt not exist")
+
+        # a = np.array(10)
+        # b = np.array([[1, 0], [0, 1]])
+        c = np.reshape(np.arange(15), [3, 5])
+        configurationTool.loggerTrace(str(c))
 
     def process(self, configurationTool, executionContextTool):
         # type: (SMCApi.ConfigurationTool, SMCApi.ExecutionContextTool) -> None
