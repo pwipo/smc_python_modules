@@ -38,9 +38,10 @@ class ModuleMain(SMCApi.Module):
         if self.fileTextValue is None:
             raise SMCApi.ModuleException("file text.txt not exist")
 
-        # a = np.array(10)
+        a = np.arange(15)
         # b = np.array([[1, 0], [0, 1]])
-        c = np.reshape(np.arange(15), [3, 5])
+        c = a.reshape([3, 5])
+        configurationTool.loggerTrace(str(a))
         configurationTool.loggerTrace(str(c))
 
     def process(self, configurationTool, executionContextTool):
