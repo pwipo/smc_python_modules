@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<properties>
+
+    <uuid>ChatBot</uuid>
+    <provider>python</provider>
+    <ver>1.0.0</ver>
+    <apiVer>1.4.1</apiVer>
+    <author>Nikolay V. Ulyanov</author>
+    <contacts>ulianownv@mail.ru</contacts>
+    <homePage>http://www.smcsystem.ru</homePage>
+    <className>main.py::ModuleMain</className>
+    <categories>Python, AI, ChatBot, Client</categories>
+    <copyrightAndLicense>
+        <entry>
+            <key>en</key>
+            <value><![CDATA[The author and copyright holder is Nikolay V. Ulyanov.
+The program is free for use.
+Forbidden: changing the program code, its sale / resale, as well as other actions and rights not explicitly permitted.
+The program is supplied as is. For problems arising during the operation or installation of the program, the author, developer and
+distributor are not responsible.
+            ]]></value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value><![CDATA[Автором и правообладателем является Ульянов Николай Владимирович.
+Программа бесплатна для использования.
+Запрещено: изменение кода программы, её продажа/перепродажа а так же иные не разрешенные явно действия и права.
+Программа поставляется как есть. За проблемы, возникающие в процессе эксплуатации или установки программы, автор, разработчик и
+распространитель ответственности не несут.
+            ]]></value>
+        </entry>
+    </copyrightAndLicense>
+    <date>01-02-2025</date>
+
+    <defaultSettings>
+        <value>
+            <name>apy_key</name>
+            <type>STRING</type>
+            <value></value>
+            <subType>PASSWORD</subType>
+            <description>
+                <entry k="ru" v="Секретный ключ, для доступа к апи чат бота. Без него работать не будет!"/>
+                <entry k="en" v="Secret key to access the chat bot API. It won't work without it!"/>
+            </description>
+        </value>
+        <value>
+            <name>type</name>
+            <type>STRING</type>
+            <validValues>
+                <value>deepseek</value>
+                <value>chatgpt</value>
+            </validValues>
+            <value>deepseek</value>
+            <description>
+                <entry k="ru" v="Тип чат бота. Сейчас доступны deepseek и chatgpt."/>
+                <entry k="en" v="Secret key to access the chat bot API."/>
+            </description>
+        </value>
+        <value>
+            <name>max_tokens</name>
+            <type>INTEGER</type>
+            <value>500</value>
+            <description>
+                <entry k="ru" v="Максимальное количество токенов в ответе."/>
+                <entry k="en" v="Maximum number of tokens in response."/>
+            </description>
+        </value>
+        <value>
+            <name>model</name>
+            <type>STRING</type>
+            <value></value>
+            <subType>STRING</subType>
+            <description>
+                <entry k="ru" v="Имя модели. Если пусто, то используется модель по умолчанию для данного чат бота."/>
+                <entry k="en" v="Maximum number of tokens in response."/>
+            </description>
+        </value>
+    </defaultSettings>
+
+    <types>
+        <type t="default" minS="1" maxS="1">
+            <description>
+                <entry k="ru">
+                    <value><![CDATA[На вход принимает массив объектов с полями: role и content.
+Это позволяет передавать историю разговора.
+Возвращает ответ в виде такого же объекта.
+                    ]]></value>
+                </entry>
+                <entry k="en">
+                    <value><![CDATA[It takes an array of objects with the fields: role and content as input.
+This allows you to transfer the conversation history.
+Returns a response in the form of the same object.
+                    ]]></value>
+                </entry>
+            </description>
+            <sources>
+                <source>
+                    <count>-1</count>
+                    <elements>
+                        <element t="VALUE" c="-1" vt="OBJECT_ARRAY">
+                            <value><![CDATA[[
+    {'role': 'system', 'content': 'Вы — полезный помощник.'},
+    {'role': 'user', 'content': 'question'}
+]
+                            ]]></value>
+                        </element>
+                    </elements>
+                </source>
+            </sources>
+            <output>
+                <element t="VALUE" c="-1" vt="OBJECT_ARRAY">
+                    <value><![CDATA[[
+    {'role': 'system', 'content': 'response'},
+]
+                            ]]></value>
+                </element>
+            </output>
+        </type>
+    </types>
+
+    <useStorage>false</useStorage>
+    <threadSafe>true</threadSafe>
+
+    <description>
+        <entry>
+            <key>en</key>
+            <value>A module for working with different chat bots.</value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value>Модуль для работы с разными чат ботами.</value>
+        </entry>
+    </description>
+
+    <help>
+        <entry>
+            <key>en</key>
+            <value><![CDATA[A module for working with different chat bots.
+Currently supported are deepseek and chatgpt.
+The module is a lightweight web client for public rest-api.
+To work, you need to get a key (api_key).
+It takes an array of objects with the fields: role and content as input.
+This allows you to transfer the conversation history.
+Returns a response in the form of the same object.
+            ]]></value>
+        </entry>
+        <entry>
+            <key>ru</key>
+            <value><![CDATA[Модуль для работы с разными чат ботами.
+Сейчас поддерживаются deepseek и chatgpt.
+Модуль является легковесным веб клиентам к общедоступным rest-api.
+Для работы нужно получить ключ (api_key).
+На вход принимает массив объектов с полями: role и content.
+Это позволяет передавать историю разговора.
+Возвращает ответ в виде такого же объекта.
+            ]]></value>
+        </entry>
+    </help>
+
+    <examples/>
+    <icon><![CDATA[iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA/0lEQVR4nO2WSQ7CMAxF3zEKHIcNVTkOwwHgWnCSrigXYFjAyiiSK0WoQ+q2lCK+ZCmS4+/vDE7gjxEjAc5ABsRDCMgAUTsNISD1BLjxxzH3BLjxIBA1flbAEjgAdy9ZqN001t0WE/aGpGW2s1QuwANYARNDAS5mrRzSdCWOGuSSt8VGudx2BOOmQVEHAiLlurY93UlN663yB90WKbAmrbfKX8f9XQIomRRrEke+ePPV+eu4wycZMS4B0qMA8yEUo5mLk54ENF4yK4E/f6bjS4N4WlfgYWt5CyRwafP2mxZ8y6aa/Gl5DSVQgN/9Ov0PhCLr80cUgrz9Fm3BH+PAC1f29hyBTkt9AAAAAElFTkSuQmCC]]></icon>
+
+</properties>
