@@ -3,7 +3,7 @@
 
     <uuid>ChatBot</uuid>
     <provider>python</provider>
-    <ver>1.0.2</ver>
+    <ver>1.0.3</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
@@ -178,25 +178,21 @@ Returns a response in the form of the same object.
         <entry>
             <key>en</key>
             <value><![CDATA[A module for working with different chat bots.
-The module is a lightweight web client for public rest-api.
-To work, you need to get a key (api_key).
-It takes an array of objects with the fields: role and content as input.
-This allows you to transfer the conversation history.
+The module is a lightweight web client for public rest-api. To work, you need to get a key (api_key).
+It takes an array of objects with the fields: role and content as input. This allows you to transfer the conversation history.
 Returns a response in the form of the same object.
-When using gigachat, you need to install the root certificate (russian_trusted_root_ca.cer) on your PC, or add it (gigachat_ca.cer) to the working directory of the configuration.
-You can download it here: https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer
+When using gigachat, you need to install the root certificate on your PC (https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer) and
+    add it to the working configuration directory under the name gigachat_ca.cer.
             ]]></value>
         </entry>
         <entry>
             <key>ru</key>
             <value><![CDATA[Модуль для работы с разными чат ботами.
-Модуль является легковесным веб клиентам к общедоступным rest-api.
-Для работы нужно получить ключ (api_key).
-На вход принимает массив объектов с полями: role и content.
-Это позволяет передавать историю разговора.
+Модуль является легковесным веб клиентам к общедоступным rest-api. Для работы нужно получить ключ (api_key).
+На вход принимает массив объектов с полями: role и content. Это позволяет передавать историю разговора.
 Возвращает ответ в виде такого же объекта.
-При использовании gigachat, нужно установить на пк корневой сертификат (russian_trusted_root_ca.cer), либо добавить его (gigachat_ca.cer) в рабочую директорию конфигурации.
-Скачать можно здесь: https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer
+При использовании gigachat, нужно установить на пк корневой сертификат (https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer) и
+    добавить его в рабочую директорию конфигурации под именем gigachat_ca.cer.
             ]]></value>
         </entry>
     </help>

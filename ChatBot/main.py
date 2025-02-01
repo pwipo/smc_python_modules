@@ -44,7 +44,7 @@ class ModuleMain(SMCApi.Module):
         elif self.type == "gigachat":
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             cert_path = configurationTool.getWorkDirectory() + os.path.sep + "gigachat_ca.cer"
-            self.cert_root = False
+            self.cert_root = True
             if os.path.isfile(cert_path):
                 self.cert_root = cert_path
             self.authorization_key = self.api_key
