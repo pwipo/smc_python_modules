@@ -21,7 +21,7 @@ class ModuleMain(SMCApi.Module):
         self.type = configurationTool.getSetting("type").getValue()
         self.max_tokens = configurationTool.getSetting("max_tokens").getValue()
         self.headers = {
-            'Authorization': "Bearer %r" % (self.apy_key),
+            'Authorization': "Bearer {}".format(self.apy_key),
             'Content-Type': 'application/json'
         }
         self.model = configurationTool.getSetting("model").getValue()
@@ -48,7 +48,7 @@ class ModuleMain(SMCApi.Module):
                 return
 
             data = {
-                "model": self.model,
+                'model': self.model,
                 'messages': arr,
                 'max_tokens': self.max_tokens
             }
@@ -65,8 +65,7 @@ class ModuleMain(SMCApi.Module):
                     response = [{"role": "system", "content": response.json()['choices'][0]['text'][1:]}]
                     executionContextTool.addMessage(SmcUtils.convertToObjectArray(response))
             except Exception as e:
-                # configurationTool.loggerWarn("request error: %r" % SmcUtils.getStackTraceAsString(e))
-                executionContextTool.addError("request error: %r" % SmcUtils.getErrorMessageOrClassName(e))
+                executionContextTool.addError("request error: %s" % SmcUtils.getErrorMessageOrClassName(e))
 
     def update(self, configurationTool):
         # type: (SMCApi.ConfigurationTool) -> None

@@ -5,16 +5,22 @@ import SmcEmulator
 
 import main
 
+with open("../../../Test/nn/OpenAI/ap.txt", 'r') as key:
+    API_KEY = key.read().strip()
+
 process = SmcEmulator.Process(
     SmcEmulator.ConfigurationToolImpl(
         "test",
         None,
         None,
         {
-            "apy_key": SmcEmulator.Value("dfg"),
-            "type": SmcEmulator.Value("deepseek"),
+            # "apy_key": SmcEmulator.Value("dfg"),
+            "apy_key": SmcEmulator.Value(API_KEY),
+            # "type": SmcEmulator.Value("deepseek"),
+            "type": SmcEmulator.Value("chatgpt"),
             "max_tokens": SmcEmulator.Value(500),
-            "model": SmcEmulator.Value(""),
+            # "model": SmcEmulator.Value(""),
+            "model": SmcEmulator.Value("gpt-3.5-turbo"),
         },
         os.getcwd()
     ), main.ModuleMain())
@@ -34,7 +40,6 @@ executionContextTool = SmcEmulator.ExecutionContextToolImpl(
     ])))])]], None, None, None, "default", "default"
 )
 
-process.execute(executionContextTool)
 output = process.execute(executionContextTool)
 for strVar in output:
     print("{}: {} - {}".format(strVar.getMessageType(), strVar.getType(), strVar.getValue()))
