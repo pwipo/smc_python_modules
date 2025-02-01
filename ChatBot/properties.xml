@@ -3,7 +3,7 @@
 
     <uuid>ChatBot</uuid>
     <provider>python</provider>
-    <ver>1.0.1</ver>
+    <ver>1.0.2</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
@@ -34,13 +34,13 @@ distributor are not responsible.
 
     <defaultSettings>
         <value>
-            <name>apy_key</name>
+            <name>api_key</name>
             <type>STRING</type>
             <value></value>
             <subType>PASSWORD</subType>
             <description>
-                <entry k="ru" v="Секретный ключ, для доступа к апи чат бота. Без него работать не будет!"/>
-                <entry k="en" v="Secret key to access the chat bot API. It won't work without it!"/>
+                <entry k="ru" v="Секретный ключ, для доступа к апи чат бота. Без него работать не будет! Для gigachat сюда вводить ключ авторизации."/>
+                <entry k="en" v="Secret key to access the chat bot API. It won't work without it! For gigachat, enter the authorization key here."/>
             </description>
         </value>
         <value>
@@ -49,11 +49,12 @@ distributor are not responsible.
             <validValues>
                 <value>deepseek</value>
                 <value>chatgpt</value>
+                <value>gigachat</value>
             </validValues>
             <value>deepseek</value>
             <description>
-                <entry k="ru" v="Тип чат бота. Сейчас доступны deepseek и chatgpt."/>
-                <entry k="en" v="Secret key to access the chat bot API."/>
+                <entry k="ru" v="Тип чат бота."/>
+                <entry k="en" v="Chat bot type."/>
             </description>
         </value>
         <value>
@@ -78,7 +79,7 @@ distributor are not responsible.
     </defaultSettings>
 
     <types>
-        <type t="default" minS="1" maxS="1">
+        <type t="get_response" minS="1" maxS="1">
             <description>
                 <entry k="ru">
                     <value><![CDATA[На вход принимает массив объектов с полями: role и content.
@@ -99,10 +100,9 @@ Returns a response in the form of the same object.
                     <elements>
                         <element t="VALUE" c="-1" vt="OBJECT_ARRAY">
                             <value><![CDATA[[
-    {'role': 'system', 'content': 'Вы — полезный помощник.'},
-    {'role': 'user', 'content': 'question'}
-]
-                            ]]></value>
+{'role': 'system', 'content': 'Вы — полезный помощник.'},
+{'role': 'user', 'content': 'question'}
+                        ]]]></value>
                         </element>
                     </elements>
                 </source>
@@ -110,15 +110,57 @@ Returns a response in the form of the same object.
             <output>
                 <element t="VALUE" c="-1" vt="OBJECT_ARRAY">
                     <value><![CDATA[[
-    {'role': 'system', 'content': 'response'},
-]
-                            ]]></value>
+{'role': 'system', 'content': 'response'},
+                ]]]></value>
+                </element>
+            </output>
+        </type>
+        <type t="get_models">
+            <description>
+                <entry k="ru" v="Получить список доступных моделей."/>
+                <entry k="en" v="Get a list of available models."/>
+            </description>
+            <sources/>
+            <output>
+                <element t="VALUE" c="-1" vt="OBJECT_ARRAY">
+                    <description>
+                        <entry k="ru" v="Возвращает список объектов, каждый из которых представляет собой информацию о доступной модели с полями: id,object,created,owned_by."/>
+                        <entry k="en" v="Returns a list of objects, each of which represents information about an available model with the fields: id,object,created,owned_by."/>
+                    </description>
+                    <value><![CDATA[[
+{'id': 'dall-e-2', 'object': 'model', 'created': 1698798177, 'owned_by': 'system'},
+{'id': 'gpt-3.5-turbo', 'object': 'model', 'created': 1677610602, 'owned_by': 'openai'},
+{'id': 'o1-preview-2024-09-12', 'object': 'model', 'created': 1725648865, 'owned_by': 'system'},
+{'id': 'gpt-3.5-turbo-0125', 'object': 'model', 'created': 1706048358, 'owned_by': 'system'},
+{'id': 'o1-preview', 'object': 'model', 'created': 1725648897, 'owned_by': 'system'},
+{'id': 'text-embedding-ada-002', 'object': 'model', 'created': 1671217299, 'owned_by': 'openai-internal'},
+{'id': 'o1-mini-2024-09-12', 'object': 'model', 'created': 1725648979, 'owned_by': 'system'},
+{'id': 'whisper-1', 'object': 'model', 'created': 1677532384, 'owned_by': 'openai-internal'},
+{'id': 'dall-e-3', 'object': 'model', 'created': 1698785189, 'owned_by': 'system'},
+{'id': 'gpt-4o-mini', 'object': 'model', 'created': 1721172741, 'owned_by': 'system'},
+{'id': 'gpt-4o-mini-2024-07-18', 'object': 'model', 'created': 1721172717, 'owned_by': 'system'},
+{'id': 'babbage-002', 'object': 'model', 'created': 1692634615, 'owned_by': 'system'},
+{'id': 'omni-moderation-latest', 'object': 'model', 'created': 1731689265, 'owned_by': 'system'},
+{'id': 'omni-moderation-2024-09-26', 'object': 'model', 'created': 1732734466, 'owned_by': 'system'},
+{'id': 'tts-1-hd-1106', 'object': 'model', 'created': 1699053533, 'owned_by': 'system'},
+{'id': 'tts-1-hd', 'object': 'model', 'created': 1699046015, 'owned_by': 'system'},
+{'id': 'gpt-3.5-turbo-instruct', 'object': 'model', 'created': 1692901427, 'owned_by': 'system'},
+{'id': 'gpt-3.5-turbo-instruct-0914', 'object': 'model', 'created': 1694122472, 'owned_by': 'system'},
+{'id': 'tts-1', 'object': 'model', 'created': 1681940951, 'owned_by': 'openai-internal'},
+{'id': 'tts-1-1106', 'object': 'model', 'created': 1699053241, 'owned_by': 'system'},
+{'id': 'davinci-002', 'object': 'model', 'created': 1692634301, 'owned_by': 'system'},
+{'id': 'text-embedding-3-small', 'object': 'model', 'created': 1705948997, 'owned_by': 'system'},
+{'id': 'gpt-3.5-turbo-1106', 'object': 'model', 'created': 1698959748, 'owned_by': 'system'},
+{'id': 'gpt-3.5-turbo-16k', 'object': 'model', 'created': 1683758102, 'owned_by': 'openai-internal'},
+{'id': 'text-embedding-3-large', 'object': 'model', 'created': 1705953180, 'owned_by': 'system'},
+{'id': 'o1-mini', 'object': 'model', 'created': 1725649008, 'owned_by': 'system'}
+                ]]]></value>
                 </element>
             </output>
         </type>
     </types>
 
-    <useStorage>false</useStorage>
+    <useStorage>true</useStorage>
     <threadSafe>true</threadSafe>
 
     <description>
@@ -136,23 +178,25 @@ Returns a response in the form of the same object.
         <entry>
             <key>en</key>
             <value><![CDATA[A module for working with different chat bots.
-Currently supported are deepseek and chatgpt.
 The module is a lightweight web client for public rest-api.
 To work, you need to get a key (api_key).
 It takes an array of objects with the fields: role and content as input.
 This allows you to transfer the conversation history.
 Returns a response in the form of the same object.
+When using gigachat, you need to install the root certificate (russian_trusted_root_ca.cer) on your PC, or add it (gigachat_ca.cer) to the working directory of the configuration.
+You can download it here: https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer
             ]]></value>
         </entry>
         <entry>
             <key>ru</key>
             <value><![CDATA[Модуль для работы с разными чат ботами.
-Сейчас поддерживаются deepseek и chatgpt.
 Модуль является легковесным веб клиентам к общедоступным rest-api.
 Для работы нужно получить ключ (api_key).
 На вход принимает массив объектов с полями: role и content.
 Это позволяет передавать историю разговора.
 Возвращает ответ в виде такого же объекта.
+При использовании gigachat, нужно установить на пк корневой сертификат (russian_trusted_root_ca.cer), либо добавить его (gigachat_ca.cer) в рабочую директорию конфигурации.
+Скачать можно здесь: https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer
             ]]></value>
         </entry>
     </help>

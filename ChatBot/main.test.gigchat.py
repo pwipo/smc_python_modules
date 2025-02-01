@@ -5,7 +5,7 @@ import SmcEmulator
 
 import main
 
-with open("../../../Test/nn/OpenAI/ap.txt", 'r') as key:
+with open("../../../Test/nn/GigaChat/at.txt", 'r') as key:
     API_KEY = key.read().strip()
 
 process = SmcEmulator.Process(
@@ -14,14 +14,12 @@ process = SmcEmulator.Process(
         None,
         None,
         {
-            # "api_key": SmcEmulator.Value("dfg"),
             "api_key": SmcEmulator.Value(API_KEY),
-            # "type": SmcEmulator.Value("deepseek"),
-            "type": SmcEmulator.Value("chatgpt"),
+            "type": SmcEmulator.Value("gigachat"),
             "max_tokens": SmcEmulator.Value(500),
-            # "model": SmcEmulator.Value(""),
-            "model": SmcEmulator.Value("gpt-3.5-turbo"),
+            "model": SmcEmulator.Value(""),
         },
+        os.getcwd(),
         os.getcwd()
     ), main.ModuleMain())
 
