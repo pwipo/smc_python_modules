@@ -3,7 +3,7 @@
 
     <uuid>ChatBot</uuid>
     <provider>python</provider>
-    <ver>1.0.3</ver>
+    <ver>1.0.4</ver>
     <apiVer>1.4.1</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
@@ -50,11 +50,12 @@ distributor are not responsible.
                 <value>deepseek</value>
                 <value>chatgpt</value>
                 <value>gigachat</value>
+                <value>custom</value>
             </validValues>
-            <value>deepseek</value>
+            <value>chatgpt</value>
             <description>
-                <entry k="ru" v="Тип чат бота."/>
-                <entry k="en" v="Chat bot type."/>
+                <entry k="ru" v="Тип чат бота. Если выбран custom, то необходимо указать url_prefix и model, например https://api.openai.com/v1."/>
+                <entry k="en" v="Chat bot type. If custom is selected, you must specify url_prefix and model, for example https://api.openai.com/v1."/>
             </description>
         </value>
         <value>
@@ -73,7 +74,18 @@ distributor are not responsible.
             <subType>STRING</subType>
             <description>
                 <entry k="ru" v="Имя модели. Если пусто, то используется модель по умолчанию для данного чат бота."/>
-                <entry k="en" v="Maximum number of tokens in response."/>
+                <entry k="en" v="Model name. If empty, the default model for this chatbot is used."/>
+            </description>
+        </value>
+        <value>
+            <name>url_prefix</name>
+            <type>STRING</type>
+            <value></value>
+            <subType>STRING</subType>
+            <description>
+                <entry k="ru"
+                       v="Префикс URL нейронки, совместимой с api chatgpt, например https://api.openai.com/v1. К префиксу будут дописываться пути: chat/completions и /models. Используется только для типа custom."/>
+                <entry k="en" v="The URL prefix of a neural network compatible with the chatgpt api, for example https://api.openai.com/v1. The prefix will be appended with the paths: chat/completions and /models. Used only for the custom type."/>
             </description>
         </value>
     </defaultSettings>

@@ -20,6 +20,7 @@ class ModuleMain(SMCApi.Module):
         self.model = None
         self.authorization_key = None
         self.cert_root = None
+        self.url_prefix = None
 
     def start(self, configurationTool):
         # type: (SMCApi.ConfigurationTool) -> None
@@ -31,6 +32,7 @@ class ModuleMain(SMCApi.Module):
             'Content-Type': 'application/json'
         }
         self.model = configurationTool.getSetting("model").getValue()
+        self.url_prefix = configurationTool.getSetting("url_prefix").getValue()
         if self.type == "deepseek":
             self.url_chat_completions = 'https://api.deepseek.com/v1/chat/completions'
             self.url_get_models = 'https://api.deepseek.com/v1/models'
@@ -54,6 +56,11 @@ class ModuleMain(SMCApi.Module):
             self.url_get_models = 'https://gigachat.devices.sberbank.ru/api/v1/models'
             if not self.model or len(self.model) == 0:
                 self.model = "GigaChat"
+        elif self.type == "custom":
+            self.url_chat_completions = self.url_prefix + '/chat/completions'
+            self.url_get_models = self.url_prefix + '/models'
+            if not self.model or len(self.model) == 0:
+                self.model = "o1-preview"
 
     def process(self, configurationTool, executionContextTool):
         # type: (SMCApi.ConfigurationTool, SMCApi.ExecutionContextTool) -> None
@@ -75,17 +82,23 @@ class ModuleMain(SMCApi.Module):
                 'messages': arr,
                 'max_tokens': self.max_tokens
             }
+            message = []
             if self.type == "deepseek":
                 response = requests.post(self.url_chat_completions, headers=self.headers, json=data)
                 response.raise_for_status()
-                response = [{"role": "system", "content": response.json()['choices'][0]['message']['content']}]
+                message = response.json()['choices'][0]['message']
             elif self.type == "chatgpt":
                 response = requests.post(self.url_chat_completions, headers=self.headers, json=data)
                 response.raise_for_status()
-                response = [{"role": "system", "content": response.json()['choices'][0]['text'][1:]}]
+                message = response.json()['choices'][0]['message']
             elif self.type == "gigachat":
                 response = self.gigachat_send_request(data)
-                response = [{"role": "system", "content": response.json()['choices'][0]['message']['content']}]
+                message = response.json()['choices'][0]['message']
+            elif self.type == "custom":
+                response = requests.post(self.url_chat_completions, headers=self.headers, json=data)
+                response.raise_for_status()
+                message = response.json()['choices'][0]['message']
+            response = [{"role": message['role'], "content": message['content'].strip()}]
             executionContextTool.addMessage(SmcUtils.convertToObjectArray(response))
         elif type == "get_models":
             response = []
@@ -99,6 +112,10 @@ class ModuleMain(SMCApi.Module):
                 response = response.json()['data']
             elif self.type == "gigachat":
                 response = self.gigachat_get_modules()
+                response = response.json()['data']
+            elif self.type == "custom":
+                response = requests.get(self.url_get_models, headers=self.headers)
+                response.raise_for_status()
                 response = response.json()['data']
             executionContextTool.addMessage(SmcUtils.convertToObjectArray(response))
 
@@ -117,6 +134,7 @@ class ModuleMain(SMCApi.Module):
         self.model = None
         self.authorization_key = None
         self.cert_root = None
+        self.url_prefix = None
 
     def gigachat_get_new_api_key(self):
         if not self.authorization_key:

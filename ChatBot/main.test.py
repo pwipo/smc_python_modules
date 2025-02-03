@@ -21,6 +21,7 @@ process = SmcEmulator.Process(
             "max_tokens": SmcEmulator.Value(500),
             # "model": SmcEmulator.Value(""),
             "model": SmcEmulator.Value("gpt-3.5-turbo"),
+            "url_prefix": SmcEmulator.Value(""),
         },
         os.getcwd()
     ), main.ModuleMain())

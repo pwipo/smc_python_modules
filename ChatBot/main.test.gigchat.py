@@ -18,6 +18,7 @@ process = SmcEmulator.Process(
             "type": SmcEmulator.Value("gigachat"),
             "max_tokens": SmcEmulator.Value(500),
             "model": SmcEmulator.Value(""),
+            "url_prefix": SmcEmulator.Value(""),
         },
         os.getcwd(),
         os.getcwd()
