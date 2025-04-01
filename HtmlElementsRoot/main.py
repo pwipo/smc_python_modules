@@ -39,25 +39,30 @@ class Shape:
         # type: (SmcUtils.ObjectDict) -> None
         keys = obj.keys()  # type: List[str]
         self.type = obj.type  # type: str
-        self.point1X = obj.point1X  # type: int
-        self.point1Y = obj.point1Y  # type: int
-        self.point2X = obj.point2X  # type: int
-        self.point2Y = obj.point2Y  # type: int
+        self.name = obj.name  # type: str
+        self.parentName = None  # type: str
+        if "parentName" in obj:
+            self.parentName = obj.parentName  # type: str
+        self.x = obj.x  # type: int
+        self.y = obj.y  # type: int
+        self.width = obj.width  # type: int
+        self.height = obj.height  # type: int
         self.offset2X = None  # type: int
         if 'offset2X' in keys:
             self.offset2X = obj.offset2X  # type: int
         self.offset2Y = None  # type: int
         if 'offset2Y' in keys:
             self.offset2Y = obj.offset2Y  # type: int
-        self.color = obj.color & 0xffffff # type: int
+        self.color = obj.color & 0xffffff  # type: int
         self.strokeWidth = obj.strokeWidth  # type: int
-        self.descriptionId = ""
-        self.descriptionOther = ""
-        if obj.description:
-            arrStr = obj.description.strip().split(" ", 2)
-            self.descriptionId = arrStr[0].strip()
-            if len(arrStr) > 1:
-                self.descriptionOther = arrStr[1].strip()
+        self.description = obj.description  # type: str
+        # self.descriptionId = ""
+        # self.descriptionOther = ""
+        # if obj.description:
+        #     arrStr = obj.description.strip().split(" ", 2)
+        #     self.descriptionId = arrStr[0].strip()
+        #     if len(arrStr) > 1:
+        #         self.descriptionOther = arrStr[1].strip()
         self.text = None  # type: str
         if 'text' in keys:
             self.text = obj.text  # type: str
@@ -135,25 +140,27 @@ class ModuleMain(SMCApi.Module):
             objList = map(lambda s: Shape(s), SmcUtils.convertFromObjectArray(objectArray, True))  # type: List[Shape]
             shape = next(iter(
                 filter(
-                    lambda s: s.type == "rectangle" and s.descriptionId == self.id, objList)))  # type: Shape
+                    lambda s: s.type == "rectangle" and s.name == self.id, objList)))  # type: Shape
 
         self.position1X = 0
         self.position1Y = 0
         self.position2X = 640
         self.position2Y = 480
+        self.width = 640
         if shape:
-            self.position1X = shape.point1X
-            self.position1Y = shape.point1Y
-            self.position2X = shape.point2X
-            self.position2Y = shape.point2Y
-            configurationTool.loggerDebug("Find shape: %s %d %d" % (self.id, shape.point1X, shape.point1Y))
+            self.position1X = shape.x
+            self.position1Y = shape.y
+            self.position2X = shape.x + shape.width
+            self.position2Y = shape.y + shape.height
+            self.width = shape.width
+            configurationTool.loggerDebug("Find shape: %s %d %d" % (self.id, shape.x, shape.y))
 
         self.htmlScript = """
 var position1X = %d;
 var position1Y = %d;
 var position2X = %d;
 var position2Y = %d;
-var width = Math.max(position2X - position1X);
+var width = %d;
 
 var multiX = window.screen.width/width; //works but looks weird
 var screenRation = window.screen.width/window.screen.height;
@@ -170,7 +177,7 @@ function convertCoordY(y) {
     // return result > 0 ? Math.min(result, height) : 0;
     return Math.floor(y*multiY);
 }
-""" % (self.position1X, self.position1Y, self.position2X, self.position2Y)
+""" % (self.position1X, self.position1Y, self.position2X, self.position2Y, self.width)
         if htmlScript:
             self.htmlScript += "\n" + htmlScript + "\n"
 

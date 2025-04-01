@@ -2,8 +2,8 @@
 <properties>
     <uuid>HtmlElementsLink</uuid>
     <provider>python</provider>
-    <ver>1.0.2</ver>
-    <apiVer>1.4.1</apiVer>
+    <ver>1.0.3</ver>
+    <apiVer>1.4.2</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
     <homePage>http://www.smcsystem.ru</homePage>
@@ -29,7 +29,7 @@ distributor are not responsible.
             ]]></value>
         </entry>
     </copyrightAndLicense>
-    <date>26-11-2024</date>
+    <date>01-04-2025</date>
 
     <defaultSettings>
         <value>
@@ -38,8 +38,8 @@ distributor are not responsible.
             <value>input1</value>
             <subType>STRING</subType>
             <description>
-                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким текстом в самом начале описания."/>
-                <entry k="en" v="Object identifier, used to find the figure with such text at the very beginning of the description."/>
+                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким именем."/>
+                <entry k="en" v="Object identifier, used to find the figure with such name."/>
             </description>
         </value>
         <value>
@@ -174,6 +174,8 @@ The text field of the found figure is used.
 
     <useStorage>false</useStorage>
     <threadSafe>true</threadSafe>
+    <useVariables>false</useVariables>
+    <useManagement>false</useManagement>
 
     <description>
         <entry>
@@ -196,9 +198,9 @@ Typically, it is a child element for the HtmlElementsRoot or HtmlElementsDiv mod
 Processes 2 types of requests:
 get - renders itself - returns an object with html elements and data cache.
 update - renders the content (similar to get).
-If you specify an id, then at startup it will look for a figure (text) with this value in the description.
+If you specify an id, it will search for a figure (text) with this name at startup.
 If it finds one, it will use its coordinates to calculate its position on the page, as well as its text and fontSize fields.
-The rest of the description is considered additional attributes and is inserted into the tag directly.
+The description is considered as additional attributes and is inserted into the tag directly.
             ]]></value>
         </entry>
         <entry>
@@ -208,9 +210,9 @@ The rest of the description is considered additional attributes and is inserted 
 Обрабатывает 2 типа запросов:
     get - отрисовывает себя - возвращает объект с html элементами и кешем данных.
     update - отрисовывает содержимое (аналогично get).
-Если задать id, то при старте будет искать фигуру (text) с этим значением в описании.
+Если задать id, то при старте будет искать фигуру (text) с этим именем.
 Если найдет, то будет использовать его координаты для вычисления положения себя на странице, а так его поля text и fontSize.
-Оставшаяся часть описания рассматривается как дополнительные атрибуты и вставляется в тег напряму.
+Описание рассматривается как дополнительные атрибуты и вставляется в тег напряму.
 ]]></value>
         </entry>
     </help>

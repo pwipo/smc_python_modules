@@ -46,25 +46,30 @@ class Shape:
         # type: (SmcUtils.ObjectDict) -> None
         keys = obj.keys()  # type: List[str]
         self.type = obj.type  # type: str
-        self.point1X = obj.point1X  # type: int
-        self.point1Y = obj.point1Y  # type: int
-        self.point2X = obj.point2X  # type: int
-        self.point2Y = obj.point2Y  # type: int
+        self.name = obj.name  # type: str
+        self.parentName = None  # type: str
+        if "parentName" in obj:
+            self.parentName = obj.parentName  # type: str
+        self.x = obj.x  # type: int
+        self.y = obj.y  # type: int
+        self.width = obj.width  # type: int
+        self.height = obj.height  # type: int
         self.offset2X = None  # type: int
         if 'offset2X' in keys:
             self.offset2X = obj.offset2X  # type: int
         self.offset2Y = None  # type: int
         if 'offset2Y' in keys:
             self.offset2Y = obj.offset2Y  # type: int
-        self.color = obj.color & 0xffffff # type: int
+        self.color = obj.color & 0xffffff  # type: int
         self.strokeWidth = obj.strokeWidth  # type: int
-        self.descriptionId = ""
-        self.descriptionOther = ""
-        if obj.description:
-            arrStr = obj.description.strip().split(" ", 2)
-            self.descriptionId = arrStr[0].strip()
-            if len(arrStr) > 1:
-                self.descriptionOther = arrStr[1].strip()
+        self.description = obj.description  # type: str
+        # self.descriptionId = ""
+        # self.descriptionOther = ""
+        # if obj.description:
+        #     arrStr = obj.description.strip().split(" ", 2)
+        #     self.descriptionId = arrStr[0].strip()
+        #     if len(arrStr) > 1:
+        #         self.descriptionOther = arrStr[1].strip()
         self.text = None  # type: str
         if 'text' in keys:
             self.text = obj.text  # type: str
@@ -96,59 +101,57 @@ class ModuleMain(SMCApi.Module):
 
         objectArray = SmcUtils.getObjectArray(configurationTool.getInfo("decorationShapes"))
         shape = None  # type: Shape
-        shapeParent = None  # type: Shape
+        # shapeParent = None  # type: Shape
         if SmcUtils.isArrayContainObjectElements(objectArray):
             objList = map(lambda s: Shape(s), SmcUtils.convertFromObjectArray(objectArray, True))  # type: List[Shape]
             shape = next(iter(
                 filter(
-                    lambda s: s.type == "rectangle" and s.descriptionId == self.id, objList)))  # type: Shape
-            if shape:
-                shapeParent = next(iter(
-                    sorted(
-                        filter(
-                            lambda
-                                s: s.type == "rectangle" and s.point1X < shape.point1X and s.point1Y < shape.point1Y and s.point2X > shape.point2X and s.point2Y > shape.point2Y,
-                            objList),
-                        lambda s1, s2: cmp(abs(s1.point2X - s1.point1X) * abs(s1.point2Y - s1.point1Y),
-                                           abs(s2.point2X - s2.point1X) * abs(s2.point2Y - s2.point1Y))
-                    )))  # type: Shape
+                    lambda s: s.type == "rectangle" and s.name == self.id, objList)))  # type: Shape
+            # if shape:
+            #     shapeParent = next(iter(
+            #         sorted(
+            #             filter(
+            #                 lambda
+            #                     s: s.type == "rectangle" and s.point1X < shape.point1X and s.point1Y < shape.point1Y and s.point2X > shape.point2X and s.point2Y > shape.point2Y,
+            #                 objList),
+            #             lambda s1, s2: cmp(abs(s1.point2X - s1.point1X) * abs(s1.point2Y - s1.point1Y),
+            #                                abs(s2.point2X - s2.point1X) * abs(s2.point2Y - s2.point1Y))
+            #         )))  # type: Shape
 
         position1X = 110
         position1Y = 30
-        position2X = 490
-        position2Y = 130
-        parentPositionX = 1
-        parentPositionY = 1
+        width = 490
+        height = 130
+        # parentPositionX = 1
+        # parentPositionY = 1
         styles = ""
         self.elementAttrs = ""
         if shape:
-            position1X = shape.point1X
-            position1Y = shape.point1Y
-            position2X = shape.point2X
-            position2Y = shape.point2Y
-            if shapeParent:
-                parentPositionX = shapeParent.point1X
-                parentPositionY = shapeParent.point1Y
-            if shape.descriptionOther:
-                self.elementAttrs = shape.descriptionOther
+            position1X = shape.x
+            position1Y = shape.y
+            width = shape.width
+            height = shape.height
+            # if shapeParent:
+            #     parentPositionX = shapeParent.point1X
+            #     parentPositionY = shapeParent.point1Y
+            if shape.description:
+                self.elementAttrs = shape.description
             styles += "border-style: solid; border-width: %dpx; border-color: #%s;" % (
                 shape.strokeWidth, '{0:06X}'.format(shape.color))
             if shape.filled:
                 styles += " background-color: #%s;" % '{0:06X}'.format(shape.color)
             configurationTool.loggerDebug(
-                "Find shape %s %d:%d, parent: %d:%d" % (self.id, shape.point1X, shape.point1Y, parentPositionX, parentPositionY))
+                "Find shape %s %d:%d, parent: %s" % (self.id, shape.x, shape.y, shape.parentName))
 
         self.elementAttrs += " style=\"%s\"" % styles
         self.htmlScript = """
 var elementId = "%s";
 var element = document.getElementById(elementId);
 if(element){
-    const position1X = convertCoordX(%d);
-    const position1Y = convertCoordY(%d);
-    const position2X = convertCoordX(%d);
-    const position2Y = convertCoordY(%d);
-    const width = Math.abs(position2X - position1X);
-    const height = Math.abs(position2Y - position1Y);
+    const position1X = %d;
+    const position1Y = %d;
+    const width = %d;
+    const height = %d;
     if(element){
         element.style.position = "absolute";
         element.style.left = position1X + "px";
@@ -157,8 +160,7 @@ if(element){
         element.style.height = height + "px";
     }
 }
-        """ % (self.id, abs(parentPositionX - position1X), abs(parentPositionY - position1Y), abs(parentPositionX - position2X),
-               abs(parentPositionY - position2Y))
+        """ % (self.id, position1X, position1Y, width, height)
         if htmlScript:
             self.htmlScript += "\n" + htmlScript + "\n"
 

@@ -2,8 +2,8 @@
 <properties>
     <uuid>HtmlElementsForm</uuid>
     <provider>python</provider>
-    <ver>1.0.2</ver>
-    <apiVer>1.4.1</apiVer>
+    <ver>1.0.3</ver>
+    <apiVer>1.4.2</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
     <homePage>http://www.smcsystem.ru</homePage>
@@ -29,7 +29,7 @@ distributor are not responsible.
             ]]></value>
         </entry>
     </copyrightAndLicense>
-    <date>25-11-2024</date>
+    <date>01-04-2025</date>
 
     <defaultSettings>
         <value>
@@ -38,8 +38,8 @@ distributor are not responsible.
             <value>form1</value>
             <subType>STRING</subType>
             <description>
-                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким текстом в самом начале описания."/>
-                <entry k="en" v="Object identifier, used to find the figure with such text at the very beginning of the description."/>
+                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким именем."/>
+                <entry k="en" v="Object identifier, used to find the figure with such name."/>
             </description>
         </value>
         <value>
@@ -213,18 +213,15 @@ The entire incoming object is passed to itexcept the cache. If it returns an err
                             </description>
                         </element>
                     </elements>
+                    <output>
+                        <element t="VALUE_ANY" c="-1" vt="STRING" v="value"/>
+                    </output>
                 </ec>
                 <ec c="-1">
                     <description>
                         <entry k="ru">
                             <value><![CDATA[Дочерний элемент, который может себя отрисовать и так же принимает входящие параметры, для самостоятельной их обработки.
 На вход передается объект с входящими параметрами, а так же кеш (старые данные, переданные ранее).
-Возвращает объект с полями:
-    id - строка - идентификатор элемента.
-    htmlHead - строка - вставляется в заголовок страницы.
-    htmlBody - строка - вставляется в тело страницы.
-    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
-    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
 Если это update запрос, то сначала дочерним элементам передается он со всеми данными, и если нет ошибок, то потом передается второй запрос get без кеша.
 Иными словами сначала отсылаются новые данные, для обработки, а потом отрисовывается пустая форма.
                             ]]></value>
@@ -232,12 +229,6 @@ The entire incoming object is passed to itexcept the cache. If it returns an err
                         <entry k="en">
                             <value><![CDATA[A child element that can draw itself and also accepts input parameters for their independent processing.
 An object with incoming parameters is passed to the input, as well as a cache (old data, previously passed).
-Returns an object with fields:
-    id - string - element identifier.
-    htmlHead - string - inserted into the page header.
-    htmlBody - string - inserted into the page body.
-    htmlScript - string - script, inserted into the end of the page body in the <script> tag.
-    data - object - data that will be saved and passed back with a new request within this session.
 If this is an update request, then first it is passed to the child elements with all the data, and if there are no errors, then the second get request is passed without the cache.
 In other words, first new data is sent for processing, and then an empty form is drawn.
                             ]]></value>
@@ -294,6 +285,31 @@ In other words, first new data is sent for processing, and then an empty form is
                             </description>
                         </element>
                     </elements>
+                    <output>
+                        <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                            <value><![CDATA[[{"id":"root", "htmlHead":"", "htmlBody":"", "htmlScript":"", "data":{"id":1}}]]]></value>
+                            <description>
+                                <entry k="ru">
+                                    <value><![CDATA[Объект с полями:
+    id - строка - идентификатор элемента.
+    htmlHead - строка - вставляется в заголовок страницы.
+    htmlBody - строка - вставляется в тело страницы.
+    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
+    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
+                            ]]></value>
+                                </entry>
+                                <entry k="en">
+                                    <value><![CDATA[Object with fields:
+    id - string - element identifier.
+    htmlHead - string - inserted into the page header.
+    htmlBody - string - inserted into the page body.
+    htmlScript - string - script, inserted into the end of the page body in the <script> tag.
+    data - object - data that will be saved and passed back with a new request within this session.
+                            ]]></value>
+                                </entry>
+                            </description>
+                        </element>
+                    </output>
                 </ec>
             </ecs>
         </type>
@@ -301,6 +317,8 @@ In other words, first new data is sent for processing, and then an empty form is
 
     <useStorage>false</useStorage>
     <threadSafe>true</threadSafe>
+    <useVariables>false</useVariables>
+    <useManagement>false</useManagement>
 
     <description>
         <entry>
@@ -326,9 +344,9 @@ The format of incoming and outgoing objects is in the description of the executi
 Processes 2 types of requests:
     get - you only need to render the content.
     update - updates the internal representation and then renders the content.
-If you specify an id, then at startup it will look for a figure (rectangle) with this value in the description.
+If you specify an id, it will search for a figure (rectangle) with this name at startup.
 If it finds one, it will use its coordinates to calculate its position on the page.
-The rest of the description is considered additional attributes and is inserted into the tag directly.
+The description is considered as additional attributes and is inserted directly into the tag.
             ]]></value>
         </entry>
         <entry>
@@ -342,9 +360,9 @@ The rest of the description is considered additional attributes and is inserted 
 Обрабатывает 2 типа запросов:
     get - нужно только отрисовать содержимое.
     update - обновляет внутреннее представление и затем отрисовывает содержимое.
-Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
+Если задать id, то при старте будет искать фигуру (прямоугольник) с этим именем.
 Если найдет, то будет использовать его координаты для вычисления положения себя на странице.
-Оставшаяся часть описания рассматривается как дополнительные атрибуты и вставляется в тег напряму.
+Описание рассматривается как дополнительные атрибуты и вставляется в тег напряму.
 ]]></value>
         </entry>
     </help>

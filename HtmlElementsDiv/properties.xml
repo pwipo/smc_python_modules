@@ -2,8 +2,8 @@
 <properties>
     <uuid>HtmlElementsDiv</uuid>
     <provider>python</provider>
-    <ver>1.0.2</ver>
-    <apiVer>1.4.1</apiVer>
+    <ver>1.0.3</ver>
+    <apiVer>1.4.2</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
     <homePage>http://www.smcsystem.ru</homePage>
@@ -29,7 +29,7 @@ distributor are not responsible.
             ]]></value>
         </entry>
     </copyrightAndLicense>
-    <date>26-11-2024</date>
+    <date>01-04-2025</date>
 
     <defaultSettings>
         <value>
@@ -38,8 +38,8 @@ distributor are not responsible.
             <value>input1</value>
             <subType>STRING</subType>
             <description>
-                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким текстом в самом начале описания."/>
-                <entry k="en" v="Object identifier, used to find the figure with such text at the very beginning of the description."/>
+                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким именем."/>
+                <entry k="en" v="Object identifier, used to find the figure with such name."/>
             </description>
         </value>
         <value>
@@ -177,6 +177,9 @@ Called on each value and the returned value is inserted into the element body.
                     <elements>
                         <element t="VALUE" c="1" vt="STRING" v="Hello world!"/>
                     </elements>
+                    <output>
+                        <element t="VALUE_ANY" c="-1" vt="STRING" v="value"/>
+                    </output>
                 </ec>
                 <ec c="-1" o="true">
                     <description>
@@ -184,12 +187,6 @@ Called on each value and the returned value is inserted into the element body.
                             <value><![CDATA[Если контекстов больше 1, то рассматривает их как полноценные элементы.
 Дочерний элемент, который может себя отрисовать и так же принимает входящие параметры, для самостоятельной их обработки.
 На вход передается объект с входящими параметрами, а так же кеш (старые данные, переданные ранее).
-Возвращает объект с полями:
-    id - строка - идентификатор элемента.
-    htmlHead - строка - вставляется в заголовок страницы.
-    htmlBody - строка - вставляется в тело страницы.
-    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
-    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
 Если это update запрос, то сначала дочерним элементам передается он со всеми данными, и если нет ошибок, то потом передается второй запрос get без кеша.
 Иными словами сначала отсылаются новые данные, для обработки, а потом отрисовывается пустая форма.
                             ]]></value>
@@ -198,12 +195,6 @@ Called on each value and the returned value is inserted into the element body.
                             <value><![CDATA[If there are more than 1 context, then it considers them as full-fledged elements.
 A child element that can draw itself and also accepts input parameters for their independent processing.
 An object with incoming parameters is passed to the input, as well as a cache (old data, previously passed).
-Returns an object with fields:
-    id - string - element identifier.
-    htmlHead - string - inserted into the page header.
-    htmlBody - string - inserted into the page body.
-    htmlScript - string - script, inserted into the end of the page body in the <script> tag.
-    data - object - data that will be saved and passed back with a new request within this session.
 If this is an update request, then first it is passed to the child elements with all the data, and if there are no errors, then the second get request is passed without the cache.
 In other words, first new data is sent for processing, and then an empty form is drawn.
                             ]]></value>
@@ -260,6 +251,31 @@ In other words, first new data is sent for processing, and then an empty form is
                             </description>
                         </element>
                     </elements>
+                    <output>
+                        <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                            <value><![CDATA[[{"id":"root", "htmlHead":"", "htmlBody":"", "htmlScript":"", "data":{"id":1}}]]]></value>
+                            <description>
+                                <entry k="ru">
+                                    <value><![CDATA[Возвращает объект с полями:
+    id - строка - идентификатор элемента.
+    htmlHead - строка - вставляется в заголовок страницы.
+    htmlBody - строка - вставляется в тело страницы.
+    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
+    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
+                            ]]></value>
+                                </entry>
+                                <entry k="en">
+                                    <value><![CDATA[Returns an object with fields:
+    id - string - element identifier.
+    htmlHead - string - inserted into the page header.
+    htmlBody - string - inserted into the page body.
+    htmlScript - string - script, inserted into the end of the page body in the <script> tag.
+    data - object - data that will be saved and passed back with a new request within this session.
+                            ]]></value>
+                                </entry>
+                            </description>
+                        </element>
+                    </output>
                 </ec>
             </ecs>
         </type>
@@ -267,6 +283,8 @@ In other words, first new data is sent for processing, and then an empty form is
 
     <useStorage>false</useStorage>
     <threadSafe>true</threadSafe>
+    <useVariables>false</useVariables>
+    <useManagement>false</useManagement>
 
     <description>
         <entry>
@@ -294,9 +312,9 @@ If the context is 1, then it considers it as a supplier of a string value (not a
 Processes 2 types of requests:
     get - renders itself - returns an object with html elements and a data cache.
     update - renders the content (similar to get).
-If you specify an id, then at startup it will look for a figure (rectangle) with this value in the description.
+If you specify an id, it will search for a figure (rectangle) with this name at startup.
 If it finds one, it will use its coordinates to calculate its position on the page.
-The rest of the description is considered additional attributes and is inserted into the tag directly.
+The description is considered as additional attributes and is inserted directly into the tag.
             ]]></value>
         </entry>
         <entry>
@@ -309,15 +327,14 @@ The rest of the description is considered additional attributes and is inserted 
 Обрабатывает 2 типа запросов:
     get - отрисовывает себя - возвращает объект с html элементами и кешем данных.
     update - отрисовывает содержимое (аналогично get).
-Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
+Если задать id, то при старте будет искать фигуру (прямоугольник) с этим именем.
 Если найдет, то будет использовать его координаты для вычисления положения себя на странице.
-Оставшаяся часть описания рассматривается как дополнительные атрибуты и вставляется в тег напряму.
+Описание рассматривается как дополнительные атрибуты и вставляется в тег напряму.
 ]]></value>
         </entry>
     </help>
 
     <examples/>
-    <icon>
-        <![CDATA[iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABx0lEQVR4nO2Yv0sDMRiGHxEVdNEOdhNXoWMXXfQPsKvuCo46iu5WHbt3ctJZtw5utrYIIqK4dFMKDk4K4o9I4Ksc6nmndzmSkhcyHEneL0+/9MvlwMvLmAaBXeAOUI61W2BbGNixYEFJWxmh0g/TuKeZQGY+qVyV6q7fg9iaEeV4o+dAXJXyIJZJ+YwkUD/QBM5xPCPzEqvtOsiRxNpwGWQCeAWegbzLIGWJs5+yr8oSRF98OhJn1jaQEnAN3HRvaL9oUWJcAX1f+vTzKXAhnpmBFIBaYN6ZlNXfdCxjV0P6GwG/msQwBpIDKsCLjH8A1oGhiHlTwDvwBIyFjBkAVoB78X4D9mIWhdggYUHGiaeKzKsa+rFUXJAkaR+Wxei5xQTbt54GSD0ByLLMa/E3FUyAJNm/LZmzFBMgZ3Jr/TdIMTBuJMI7yf9QpVV+9Rnwk6rSr+Gj1Myy/IYdiCffemAUeJSyq8tvlBriVcKyV5Q18dQHoWkpkyCX4rmAwyBz4teJ8Q5mNciB+G2RjZQJkLxcnHT5nMRhkE3xOiQ7KRMgbfHSHxmcBqlLi7qf4PKd3ZSUB7FMymfEMqmezYhyvNEzIF5epK8Po/83ENea8bsAAAAASUVORK5CYII=]]></icon>
+    <icon><![CDATA[iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABx0lEQVR4nO2Yv0sDMRiGHxEVdNEOdhNXoWMXXfQPsKvuCo46iu5WHbt3ctJZtw5utrYIIqK4dFMKDk4K4o9I4Ksc6nmndzmSkhcyHEneL0+/9MvlwMvLmAaBXeAOUI61W2BbGNixYEFJWxmh0g/TuKeZQGY+qVyV6q7fg9iaEeV4o+dAXJXyIJZJ+YwkUD/QBM5xPCPzEqvtOsiRxNpwGWQCeAWegbzLIGWJs5+yr8oSRF98OhJn1jaQEnAN3HRvaL9oUWJcAX1f+vTzKXAhnpmBFIBaYN6ZlNXfdCxjV0P6GwG/msQwBpIDKsCLjH8A1oGhiHlTwDvwBIyFjBkAVoB78X4D9mIWhdggYUHGiaeKzKsa+rFUXJAkaR+Wxei5xQTbt54GSD0ByLLMa/E3FUyAJNm/LZmzFBMgZ3Jr/TdIMTBuJMI7yf9QpVV+9Rnwk6rSr+Gj1Myy/IYdiCffemAUeJSyq8tvlBriVcKyV5Q18dQHoWkpkyCX4rmAwyBz4teJ8Q5mNciB+G2RjZQJkLxcnHT5nMRhkE3xOiQ7KRMgbfHSHxmcBqlLi7qf4PKd3ZSUB7FMymfEMqmezYhyvNEzIF5epK8Po/83ENea8bsAAAAASUVORK5CYII=]]></icon>
 
 </properties>

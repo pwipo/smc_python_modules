@@ -28,11 +28,12 @@ def getInfo(key):
         return SmcEmulator.Value(
             SMCApi.ObjectArray(SMCApi.ObjectType.OBJECT_ELEMENT, [SMCApi.ObjectElement([
                 SMCApi.ObjectField("type", "rectangle"),
-                SMCApi.ObjectField("description", "root"),
-                SMCApi.ObjectField("point1X", 1),
-                SMCApi.ObjectField("point1Y", 1),
-                SMCApi.ObjectField("point2X", 100),
-                SMCApi.ObjectField("point2Y", 100),
+                SMCApi.ObjectField("name", "root"),
+                SMCApi.ObjectField("description", "root1"),
+                SMCApi.ObjectField("x", 1),
+                SMCApi.ObjectField("y", 1),
+                SMCApi.ObjectField("width", 100),
+                SMCApi.ObjectField("height", 100),
                 SMCApi.ObjectField("color", 1),
                 SMCApi.ObjectField("strokeWidth", 1),
             ])])

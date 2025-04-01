@@ -2,8 +2,8 @@
 <properties>
     <uuid>HtmlElementsRoot</uuid>
     <provider>python</provider>
-    <ver>1.0.2</ver>
-    <apiVer>1.4.1</apiVer>
+    <ver>1.0.3</ver>
+    <apiVer>1.4.2</apiVer>
     <author>Nikolay V. Ulyanov</author>
     <contacts>ulianownv@mail.ru</contacts>
     <homePage>http://www.smcsystem.ru</homePage>
@@ -29,7 +29,7 @@ distributor are not responsible.
             ]]></value>
         </entry>
     </copyrightAndLicense>
-    <date>24-11-2024</date>
+    <date>01-04-2025</date>
 
     <defaultSettings>
         <value>
@@ -38,8 +38,8 @@ distributor are not responsible.
             <value>root</value>
             <subType>STRING</subType>
             <description>
-                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким текстом в самом начале описания."/>
-                <entry k="en" v="Object identifier, used to find the figure with such text at the very beginning of the description."/>
+                <entry k="ru" v="Идентификатор объекта, используется для нахождения фигуры с таким именем."/>
+                <entry k="en" v="Object identifier, used to find the figure with such name."/>
             </description>
         </value>
         <value>
@@ -156,23 +156,11 @@ Fields: method,reqId,uri,remoteAddr,sessionId,params,headers,multipart,size,data
                         <entry k="ru">
                             <value><![CDATA[Дочерний элемент, который может себя отрисовать и так же принимает входящие параметры, для самостоятельной их обработки.
 На вход передается объект с входящими параметрами, а так же кеш (старые данные, переданные ранее).
-Возвращает объект с полями:
-    id - строка - идентификатор элемента.
-    htmlHead - строка - вставляется в заголовок страницы.
-    htmlBody - строка - вставляется в тело страницы.
-    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
-    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
                             ]]></value>
                         </entry>
                         <entry k="en">
                             <value><![CDATA[A child element that can draw itself and also accepts input parameters for their independent processing.
 An object with incoming parameters is passed to the input, as well as a cache (old data, previously passed).
-Returns an object with fields:
-    id - string - element identifier.
-    htmlHead - string - inserted into the page header.
-    htmlBody - string - inserted into the page body.
-    htmlScript - string - script, inserted into the end of the page body in the <script> tag.
-    data - object - data that will be saved and passed back with a new request within this session.
                             ]]></value>
                         </entry>
                     </description>
@@ -217,6 +205,31 @@ Returns an object with fields:
                             </description>
                         </element>
                     </elements>
+                    <output>
+                        <element t="VALUE" c="1" vt="OBJECT_ARRAY">
+                            <value><![CDATA[[{"id":"root", "htmlHead":"", "htmlBody":"", "htmlScript":"", "data":{"id":1}}]]]></value>
+                            <description>
+                                <entry k="ru">
+                                    <value><![CDATA[Объект с полями:
+    id - строка - идентификатор элемента.
+    htmlHead - строка - вставляется в заголовок страницы.
+    htmlBody - строка - вставляется в тело страницы.
+    htmlScript - строка - скрипт, вставляется в конец теля страницы в тег <script>.
+    data - объект - данные, которые будут сохранены и переданы обратно при новом запросе в рамках данной сессии.
+                            ]]></value>
+                                </entry>
+                                <entry k="en">
+                                    <value><![CDATA[Object with fields:
+    id - string - element identifier.
+    htmlHead - string - inserted into the page header.
+    htmlBody - string - inserted into the page body.
+    htmlScript - string - script, inserted into the end of the page body in the <script> tag.
+    data - object - data that will be saved and passed back with a new request within this session.
+                            ]]></value>
+                                </entry>
+                            </description>
+                        </element>
+                    </output>
                 </ec>
             </ecs>
         </type>
@@ -224,6 +237,8 @@ Returns an object with fields:
 
     <useStorage>false</useStorage>
     <threadSafe>true</threadSafe>
+    <useVariables>false</useVariables>
+    <useManagement>false</useManagement>
 
     <description>
         <entry>
@@ -245,9 +260,8 @@ For any request, it polls its child elements (all connected contexts), passing t
 The response is saved in the cache and an html page is formed.
 The format of incoming and outgoing objects is in the description of the execution context.
 It is assumed that for Get requests, you only need to render the content, and Post updates the internal representation and then also renders the content.
-If you specify an id, then at startup it will look for a figure (rectangle) with this value in the description.
+If you specify an id, then at startup it will look for a figure (rectangle) with this name.
 If it finds one, it will use its coordinates to calculate the positions of child elements on the page.
-This is done by calling convertCoordX(x), convertCoordY(y).
 The positioning itself is implemented by the child elements themselves.
             ]]></value>
         </entry>
@@ -259,16 +273,14 @@ The positioning itself is implemented by the child elements themselves.
 Ответ сохраняет в кеше и формирует html страницу.
 Формат входящих и исходящих объектов находится в описании контекста исполнения.
 Предполагается что на Get запросы, нужно только отрисовать содержимое, а Post обновляют внутреннее представление и затем так же отрисовать содержимое.
-Если задать id, то при старте будет искать фигуру (прямоугольник) с этим значением в описании.
+Если задать id, то при старте будет искать фигуру (прямоугольник) с этим именем.
 Если найдет, то будет использовать его координаты для вычисления позиций дочерних элементов на странице.
-Это делается через вызов convertCoordX(x), convertCoordY(y).
 Само позиционирование реализуется дочерними элементами самостоятельно.
 ]]></value>
         </entry>
     </help>
 
     <examples/>
-    <icon>
-        <![CDATA[iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABqUlEQVR4nO2azStEURjGfz62owzZWfha+QP4D6TsxtaGsbKQPWuKhZCi2PgoVhZYsFBKSVhISlKKjA0bG0mObr13Ot0acy3GfW+9vzp1nvecOXOfnnPudGcGDMP4K/3AC+CUtgKQi2NEswnnmSlLOFkrLu71mZF/wlkiynCWiDKcJaIMZ4kow1kiynCWSIQGoBXIRHQdkJV+tFUBjdKv99YK5wdrBGREB3MrnsisjA+LnhY9AkyWeH6oBdakv+qttSm1RdF50XNJGxkCDoE3qZ2JrgF2pXbjrXUvtQ1tRkKOpNZdrMCp1L5lSzV577WXpJFR2e/zMY3cegn0AH3AJ/AInCRpxEVaOSOvwDrwAYwDE8AlcAVcJ2nkATj3vqz4zUg18AUsABfADrANLMs5ekrLGcmKngKW5MKDrTYIHAPvaTHSLjrYTgPeoe8A9r1bdF67kS7RY0CL9J9lbEt08CEYGrmTrRe0Zk1GeiOvOQBmpL8iY22eEb91VspI0jgzogxniSjDWSLKcJaIMpwlogxniaQ1kUKJR9nU/TydU26mEPcPA4ZhUOQHFk3RDloWB6UAAAAASUVORK5CYII=]]></icon>
+    <icon><![CDATA[iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABqUlEQVR4nO2azStEURjGfz62owzZWfha+QP4D6TsxtaGsbKQPWuKhZCi2PgoVhZYsFBKSVhISlKKjA0bG0mObr13Ot0acy3GfW+9vzp1nvecOXOfnnPudGcGDMP4K/3AC+CUtgKQi2NEswnnmSlLOFkrLu71mZF/wlkiynCWiDKcJaIMZ4kow1kiynCWSIQGoBXIRHQdkJV+tFUBjdKv99YK5wdrBGREB3MrnsisjA+LnhY9AkyWeH6oBdakv+qttSm1RdF50XNJGxkCDoE3qZ2JrgF2pXbjrXUvtQ1tRkKOpNZdrMCp1L5lSzV577WXpJFR2e/zMY3cegn0AH3AJ/AInCRpxEVaOSOvwDrwAYwDE8AlcAVcJ2nkATj3vqz4zUg18AUsABfADrANLMs5ekrLGcmKngKW5MKDrTYIHAPvaTHSLjrYTgPeoe8A9r1bdF67kS7RY0CL9J9lbEt08CEYGrmTrRe0Zk1GeiOvOQBmpL8iY22eEb91VspI0jgzogxniSjDWSLKcJaIMpwlogxniaQ1kUKJR9nU/TydU26mEPcPA4ZhUOQHFk3RDloWB6UAAAAASUVORK5CYII=]]></icon>
 
 </properties>
